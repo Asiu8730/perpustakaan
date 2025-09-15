@@ -26,13 +26,20 @@ body {
 
 .sidebar h2 {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     font-size: 20px;
     color: #ecf0f1;
 }
 
+.sidebar hr {
+    border: 0;
+    height: 1px;
+    background: #7f8c8d;
+    margin: 10px 0;
+}
 /* Menu */
 .sidebar ul {
+    text-align: left;
     list-style: none;
     padding: 0;
 }

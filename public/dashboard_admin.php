@@ -3,7 +3,8 @@ session_start();
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
     exit();
-}
 
-include __DIR__ . '/../view/admin/dashboard.php';
+}
 ?>
+
+<?php include __DIR__ . '/../view/admin/dashboard.php'; ?>

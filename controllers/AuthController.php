@@ -29,18 +29,29 @@ class AuthController {
     }
 
     public static function register($username, $email, $password) {
-        global $conn;
-        $hash = password_hash($password, PASSWORD_BCRYPT);
+    global $conn;
 
-        $stmt = $conn->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, 'user')");
-        $stmt->bind_param("sss", $username, $email, $hash);
+    // cek apakah username sudah ada
+    $stmt = $conn->prepare("SELECT id FROM users WHERE username=? OR email=? LIMIT 1");
+    $stmt->bind_param("ss", $username, $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-        if ($stmt->execute()) {
-            return true;
-        } else {
-            return "Gagal registrasi: " . $stmt->error;
-        }
+    if ($result->num_rows > 0) {
+        return "Username atau Email sudah terdaftar!";
     }
+
+    // kalau belum ada → lanjut insert
+    $hash = password_hash($password, PASSWORD_BCRYPT);
+    $stmt = $conn->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, 'user')");
+    $stmt->bind_param("sss", $username, $email, $hash);
+
+    if ($stmt->execute()) {
+        return true;
+    } else {
+        return "Gagal registrasi: " . $stmt->error;
+    }
+}
 
     public static function logout() {
     session_start();          // pastikan session aktif
