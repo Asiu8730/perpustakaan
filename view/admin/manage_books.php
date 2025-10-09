@@ -1,114 +1,190 @@
 <?php
-session_start();
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: ../public/login.php");
-    exit();
-}
-
 require_once __DIR__ . '/../../controllers/BookController.php';
+require_once __DIR__ . '/../../controllers/CategoriesController.php';
 
 // Tambah buku
 if (isset($_POST['add'])) {
-    BookController::addBook($_POST['title'], $_POST['author'], $_POST['publisher'], $_POST['year'], $_POST['stock']);
-    header("Location: manage_books.php");
+    BookController::addBook(
+        $_POST['title'],
+        $_POST['author'],
+        $_POST['publisher'],
+        $_POST['category'],
+        $_POST['publish_date'],
+        $_POST['stock']
+    );
+    header("Location: ../public/dashboard_admin.php?page=books");
     exit();
 }
 
 // Update buku
 if (isset($_POST['update'])) {
-    BookController::updateBook($_POST['id'], $_POST['title'], $_POST['author'], $_POST['publisher'], $_POST['year'], $_POST['stock']);
-    header("Location: manage_books.php");
+    BookController::updateBook(
+        $_POST['id'],
+        $_POST['title'],
+        $_POST['author'],
+        $_POST['publisher'],
+        $_POST['category'],
+        $_POST['publish_date'],
+        $_POST['stock']
+    );
+    header("Location: ../public/dashboard_admin.php?page=books");
     exit();
 }
 
 // Hapus buku
 if (isset($_GET['delete'])) {
     BookController::deleteBook($_GET['delete']);
-    header("Location: manage_books.php");
+    header("Location: ../public/dashboard_admin.php?page=books");
     exit();
 }
 
+// Ambil data buku & kategori
 $books = BookController::getAllBooks();
+$categories = CategoriesController::getAllCategories();
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Kelola Buku</title>
-    <link rel="stylesheet" href="../public/assets/css/navbar.css">
-    <style>
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        table, th, td { border: 1px solid #ddd; }
-        th, td { padding: 10px; text-align: left; }
-        th { background: #2c3e50; color: #fff; }
-        form { margin-top: 20px; }
-        input, button { padding: 8px; margin: 5px; }
-    </style>
-</head>
-<body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2>Admin Panel</h2>
-        <ul>
-            <li><a href="dashboard_admin.php">Dashboard</a></li>
-            <li><a href="manage_books.php">Kelola Buku</a></li>
-            <li><a href="manage_users.php">Kelola User</a></li>
-            <li><a href="../public/logout.php">Logout</a></li>
-        </ul>
-    </div>
+<base href="/reca/perpustakaan/public/">
+<link rel="stylesheet" href="assets/css/books.css">
 
-    <!-- Main content -->
-    <div class="main-content">
-        <h1>Kelola Buku</h1>
+<div class="books-container">
+    <h1>Kelola Buku</h1>
 
-        <!-- Form tambah buku -->
-        <h3>Tambah Buku</h3>
-        <form method="POST">
-            <input type="text" name="title" placeholder="Judul Buku" required>
-            <input type="text" name="author" placeholder="Penulis" required>
-            <input type="text" name="publisher" placeholder="Penerbit" required>
-            <input type="number" name="year" placeholder="Tahun" required>
-            <input type="number" name="stock" placeholder="Stok" required>
-            <button type="submit" name="add">Tambah</button>
-        </form>
+   <!-- Tombol Tambah Buku -->
+<button type="button" class="action-btn update-btn" onclick="openAddModal()">+ Tambah Buku</button>
 
-        <!-- Daftar buku -->
-        <h3>Daftar Buku</h3>
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Judul</th>
-                <th>Penulis</th>
-                <th>Penerbit</th>
-                <th>Tahun</th>
-                <th>Stok</th>
-                <th>Aksi</th>
-            </tr>
-            <?php while($row = $books->fetch_assoc()): ?>
-            <tr>
-                <td><?= $row['id'] ?></td>
-                <td><?= $row['title'] ?></td>
-                <td><?= $row['author'] ?></td>
-                <td><?= $row['publisher'] ?></td>
-                <td><?= $row['year'] ?></td>
-                <td><?= $row['stock'] ?></td>
-                <td>
-                    <!-- Edit -->
-                    <form method="POST" style="display:inline-block;">
-                        <input type="hidden" name="id" value="<?= $row['id'] ?>">
-                        <input type="text" name="title" value="<?= $row['title'] ?>">
-                        <input type="text" name="author" value="<?= $row['author'] ?>">
-                        <input type="text" name="publisher" value="<?= $row['publisher'] ?>">
-                        <input type="number" name="year" value="<?= $row['year'] ?>">
-                        <input type="number" name="stock" value="<?= $row['stock'] ?>">
-                        <button type="submit" name="update">Update</button>
-                    </form>
-                    <!-- Hapus -->
-                    <a href="?delete=<?= $row['id'] ?>" onclick="return confirm('Hapus buku ini?')">Hapus</a>
-                </td>
-            </tr>
+    <!-- Daftar Buku -->
+    <h3>Daftar Buku</h3>
+    <table class="books-table">
+        <tr>
+            <th>Judul</th>
+            <th>Penulis</th>
+            <th>Penerbit</th>
+            <th>Kategori</th>
+            <th>Tanggal Terbit</th>
+            <th>Stok</th>
+            <th>Aksi</th>
+        </tr>
+        <?php while ($row = $books->fetch_assoc()): ?>
+        <tr>
+            <td><?= htmlspecialchars($row['title']) ?></td>
+            <td><?= htmlspecialchars($row['author']) ?></td>
+            <td><?= htmlspecialchars($row['publisher']) ?></td>
+            <td><?= htmlspecialchars($row['category_name'] ?? '-') ?></td>
+            <td><?= htmlspecialchars($row['publish_date']) ?></td>
+            <td><?= htmlspecialchars($row['stock']) ?></td>
+            <td>
+    <button type="button" class="action-btn update-btn"
+        onclick="openEditModal(
+            '<?= $row['id'] ?>',
+            '<?= htmlspecialchars($row['title'], ENT_QUOTES) ?>',
+            '<?= htmlspecialchars($row['author'], ENT_QUOTES) ?>',
+            '<?= htmlspecialchars($row['publisher'], ENT_QUOTES) ?>',
+            '<?= $row['category_id'] ?>',
+            '<?= $row['publish_date'] ?>',
+            '<?= $row['stock'] ?>'
+        )">
+        Edit
+    </button>
+    <a href="../public/dashboard_admin.php?page=books&delete=<?= $row['id'] ?>" 
+       class="action-btn delete-btn"
+       onclick="return confirm('Hapus buku ini?')">Hapus</a>
+</td>
+        </tr>
+        <?php endwhile; ?>
+    </table>
+</div>
+
+<!-- Modal Tambah Buku -->
+<div id="addModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close" onclick="closeAddModal()">&times;</span>
+    <h3>Tambah Buku</h3>
+    <form method="POST" class="books-form">
+        <input type="text" name="title" placeholder="Judul Buku" required>
+        <input type="text" name="author" placeholder="Penulis" required>
+        <input type="text" name="publisher" placeholder="Penerbit" required>
+
+        <select name="category" required>
+            <option value="">-- Pilih Kategori --</option>
+            <?php
+            $categories = CategoriesController::getAllCategories();
+            while ($cat = $categories->fetch_assoc()): ?>
+                <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
             <?php endwhile; ?>
-        </table>
-    </div>
-</body>
-</html>
+        </select>
+
+        <input type="date" name="publish_date" required>
+        <input type="number" name="stock" placeholder="Stok" required>
+        <button type="submit" name="add" class="btn-primary">Tambah</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Edit Buku -->
+<div id="editModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close" onclick="closeEditModal()">&times;</span>
+    <h3>Edit Buku</h3>
+    <form method="POST" class="books-form">
+        <input type="hidden" name="id" id="edit_id">
+        <input type="text" name="title" id="edit_title" required>
+        <input type="text" name="author" id="edit_author" required>
+        <input type="text" name="publisher" id="edit_publisher" required>
+        <select name="category" id="edit_category" required>
+            <option value="">-- Pilih Kategori --</option>
+            <?php
+            $categories2 = CategoriesController::getAllCategories();
+            while ($cat = $categories2->fetch_assoc()): ?>
+                <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
+            <?php endwhile; ?>
+        </select>
+        <input type="date" name="publish_date" id="edit_publish_date" required>
+        <input type="number" name="stock" id="edit_stock" required>
+        <button type="submit" name="update" class="btn-primary">Update</button>
+    </form>
+  </div>
+</div>
+
+<script>
+    function openAddModal() {
+    console.log("Modal Tambah dibuka"); // debug
+    document.getElementById("addModal").style.display = "block";
+}
+
+function closeAddModal() {
+    document.getElementById("addModal").style.display = "none";
+}
+
+window.onclick = function(event) {
+    let modal = document.getElementById("addModal");
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+}
+
+function openEditModal(id, title, author, publisher, category, publish_date, stock) {
+    console.log("Modal Edit dibuka:", id, title); // Debug
+
+    document.getElementById("edit_id").value = id;
+    document.getElementById("edit_title").value = title;
+    document.getElementById("edit_author").value = author;
+    document.getElementById("edit_publisher").value = publisher;
+    document.getElementById("edit_category").value = category;
+    document.getElementById("edit_publish_date").value = publish_date;
+    document.getElementById("edit_stock").value = stock;
+
+    document.getElementById("editModal").style.display = "block";
+}
+
+function closeEditModal() {
+    document.getElementById("editModal").style.display = "none";
+}
+
+// Tutup modal jika klik luar
+window.onclick = function(event) {
+    let modal = document.getElementById("editModal");
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+}
+</script>

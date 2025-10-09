@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Register - Perpustakaan</title>
-    <link rel="stylesheet" href="assets/css/login.css">
+    <link rel="stylesheet" href="assets/css/register.css">
 
 </head>
 <body>

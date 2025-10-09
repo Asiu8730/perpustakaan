@@ -1,0 +1,140 @@
+/* ===== Styling tabel kelola buku ===== */
+.books-table {
+    width: 100%;
+    border-collapse: collapse; /* satukan border */
+    margin-top: 15px;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.books-table th, .books-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.books-table th {
+    background: #2c3e50;
+    color: #fff;
+    font-weight: bold;
+}
+
+.books-table tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+.books-table tr:hover {
+    background: #f1f1f1;
+}
+
+/* ===== Tombol aksi ===== */
+.action-btn {
+    padding: 6px 12px;
+    margin: 2px;
+    font-size: 13px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.update-btn {
+    background: #3498db;
+    color: #fff;
+}
+
+.delete-btn {
+    background: #e74c3c;
+    color: #fff;
+}
+
+/* ===== Modal ===== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.4);
+}
+.modal-content {
+  background: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  width: 400px;
+  border-radius: 8px;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: black;
+}
+/* ===== Form di dalam modal ===== */
+.books-form input,
+.books-form select,
+.books-form button {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.books-form select {
+  background: #fff;
+  cursor: pointer;
+}
+
+.books-form button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.books-form button:hover {
+  background-color: #0056b3;
+}
+.search-form {
+    margin-bottom: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.search-form input {
+    padding: 8px;
+    width: 200px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.search-form button, .reset-btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    background: #007BFF;
+    color: white;
+    cursor: pointer;
+}
+
+.reset-btn {
+    background: #6c757d;
+    text-decoration: none;
+    line-height: 32px;
+}
