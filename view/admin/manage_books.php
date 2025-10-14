@@ -3,14 +3,25 @@ require_once __DIR__ . '/../../controllers/BookController.php';
 require_once __DIR__ . '/../../controllers/CategoriesController.php';
 
 // Tambah buku
+$upload_dir = __DIR__ . '/../../uploads/covers/';
+if (!file_exists($upload_dir)) mkdir($upload_dir, 0777, true);
+
+// Tambah buku
 if (isset($_POST['add'])) {
+    $cover_name = null;
+    if (!empty($_FILES['cover']['name'])) {
+        $cover_name = time() . '_' . basename($_FILES['cover']['name']);
+        move_uploaded_file($_FILES['cover']['tmp_name'], $upload_dir . $cover_name);
+    }
+
     BookController::addBook(
         $_POST['title'],
         $_POST['author'],
         $_POST['publisher'],
         $_POST['category'],
         $_POST['publish_date'],
-        $_POST['stock']
+        $_POST['stock'],
+        $cover_name
     );
     header("Location: ../public/dashboard_admin.php?page=books");
     exit();
@@ -18,6 +29,12 @@ if (isset($_POST['add'])) {
 
 // Update buku
 if (isset($_POST['update'])) {
+    $cover_name = null;
+    if (!empty($_FILES['cover']['name'])) {
+        $cover_name = time() . '_' . basename($_FILES['cover']['name']);
+        move_uploaded_file($_FILES['cover']['tmp_name'], $upload_dir . $cover_name);
+    }
+
     BookController::updateBook(
         $_POST['id'],
         $_POST['title'],
@@ -25,7 +42,8 @@ if (isset($_POST['update'])) {
         $_POST['publisher'],
         $_POST['category'],
         $_POST['publish_date'],
-        $_POST['stock']
+        $_POST['stock'],
+        $cover_name
     );
     header("Location: ../public/dashboard_admin.php?page=books");
     exit();
@@ -39,7 +57,8 @@ if (isset($_GET['delete'])) {
 }
 
 // Ambil data buku & kategori
-$books = BookController::getAllBooks();
+$sort = isset($_GET['sort']) ? $_GET['sort'] : '';
+$books = BookController::getAllBooks($sort);
 $categories = CategoriesController::getAllCategories();
 ?>
 
@@ -56,6 +75,7 @@ $categories = CategoriesController::getAllCategories();
     <h3>Daftar Buku</h3>
     <table class="books-table">
         <tr>
+            <th>Cover</th>
             <th>Judul</th>
             <th>Penulis</th>
             <th>Penerbit</th>
@@ -66,6 +86,12 @@ $categories = CategoriesController::getAllCategories();
         </tr>
         <?php while ($row = $books->fetch_assoc()): ?>
         <tr>
+            <td><?php if (!empty($row['cover'])): ?>
+            <img src="../uploads/covers/<?= htmlspecialchars($row['cover']) ?>" width="60" height="80" style="object-fit:cover;border-radius:4px;">
+            <?php else: ?>
+            <span>-</span>
+            <?php endif; ?>
+            </td>
             <td><?= htmlspecialchars($row['title']) ?></td>
             <td><?= htmlspecialchars($row['author']) ?></td>
             <td><?= htmlspecialchars($row['publisher']) ?></td>
@@ -97,27 +123,39 @@ $categories = CategoriesController::getAllCategories();
 <!-- Modal Tambah Buku -->
 <div id="addModal" class="modal" style="display:none;">
   <div class="modal-content">
-    <span class="close" onclick="closeAddModal()">&times;</span>
-    <h3>Tambah Buku</h3>
-    <form method="POST" class="books-form">
-        <input type="text" name="title" placeholder="Judul Buku" required>
-        <input type="text" name="author" placeholder="Penulis" required>
-        <input type="text" name="publisher" placeholder="Penerbit" required>
-
-        <select name="category" required>
-            <option value="">-- Pilih Kategori --</option>
-            <?php
-            $categories = CategoriesController::getAllCategories();
-            while ($cat = $categories->fetch_assoc()): ?>
-                <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
-            <?php endwhile; ?>
-        </select>
-
-        <input type="date" name="publish_date" required>
-        <input type="number" name="stock" placeholder="Stok" required>
-        <button type="submit" name="add" class="btn-primary">Tambah</button>
+        <span class="close" onclick="closeAddModal()">&times;</span>
+        <h3>Tambah Buku</h3>
+    <form method="GET" action="../public/dashboard_admin.php" style="margin-bottom: 15px;">
+    <input type="hidden" name="page" value="books">
+    <label for="sort">Urutkan berdasarkan:</label>
+    <select name="sort" id="sort" onchange="this.form.submit()">
+        <option value="">-- Pilih Urutan --</option>
+        <option value="title_asc" <?= (isset($_GET['sort']) && $_GET['sort'] == 'title_asc') ? 'selected' : '' ?>>Nama (A-Z)</option>
+        <option value="title_desc" <?= (isset($_GET['sort']) && $_GET['sort'] == 'title_desc') ? 'selected' : '' ?>>Nama (Z-A)</option>
+        <option value="newest" <?= (isset($_GET['sort']) && $_GET['sort'] == 'newest') ? 'selected' : '' ?>>Terbaru</option>
+        <option value="oldest" <?= (isset($_GET['sort']) && $_GET['sort'] == 'oldest') ? 'selected' : '' ?>>Terlama</option>
+    </select>
     </form>
-  </div>
+        <form method="POST" enctype="multipart/form-data" class="books-form">
+                <input type="text" name="title" placeholder="Judul Buku" required>
+                <input type="text" name="author" placeholder="Penulis" required>
+                <input type="text" name="publisher" placeholder="Penerbit" required>
+                <select name="category" required>
+                    <option value="">-- Pilih Kategori --</option>
+                    <?php while ($cat = $categories->fetch_assoc()): ?>
+                        <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
+                    <?php endwhile; ?>
+                </select>
+                <input type="date" name="publish_date" required>
+                <input type="number" name="stock" placeholder="Stok" required>
+
+                <!-- Tambahan baru -->
+                <label for="cover">Cover Buku</label>
+                <input type="file" name="cover" accept="image/*">
+
+                <button type="submit" name="add" class="btn-primary">Tambah</button>
+        </form>
+    </div>
 </div>
 
 <!-- Modal Edit Buku -->
@@ -125,24 +163,29 @@ $categories = CategoriesController::getAllCategories();
   <div class="modal-content">
     <span class="close" onclick="closeEditModal()">&times;</span>
     <h3>Edit Buku</h3>
-    <form method="POST" class="books-form">
-        <input type="hidden" name="id" id="edit_id">
-        <input type="text" name="title" id="edit_title" required>
-        <input type="text" name="author" id="edit_author" required>
-        <input type="text" name="publisher" id="edit_publisher" required>
-        <select name="category" id="edit_category" required>
-            <option value="">-- Pilih Kategori --</option>
-            <?php
-            $categories2 = CategoriesController::getAllCategories();
-            while ($cat = $categories2->fetch_assoc()): ?>
-                <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
-            <?php endwhile; ?>
-        </select>
-        <input type="date" name="publish_date" id="edit_publish_date" required>
-        <input type="number" name="stock" id="edit_stock" required>
-        <button type="submit" name="update" class="btn-primary">Update</button>
-    </form>
-  </div>
+        <form method="POST" enctype="multipart/form-data" class="books-form">
+            <input type="hidden" name="id" id="edit_id">
+            <input type="text" name="title" id="edit_title" required>
+            <input type="text" name="author" id="edit_author" required>
+            <input type="text" name="publisher" id="edit_publisher" required>
+            <select name="category" id="edit_category" required>
+                <option value="">-- Pilih Kategori --</option>
+                <?php
+                $categories2 = CategoriesController::getAllCategories();
+                while ($cat = $categories2->fetch_assoc()): ?>
+                    <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
+                <?php endwhile; ?>
+            </select>
+            <input type="date" name="publish_date" id="edit_publish_date" required>
+            <input type="number" name="stock" id="edit_stock" required>
+
+            <!-- Tambahan baru -->
+            <label for="cover">Ganti Cover (opsional)</label>
+            <input type="file" name="cover" accept="image/*">
+
+            <button type="submit" name="update">Update</button>
+        </form>
+    </div>
 </div>
 
 <script>

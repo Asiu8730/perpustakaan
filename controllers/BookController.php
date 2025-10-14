@@ -3,12 +3,31 @@ require_once __DIR__ . '/../config/database.php';
 
 class BookController {
     // Ambil semua buku (dengan nama kategori)
-    public static function getAllBooks() {
+    public static function getAllBooks($sort = '') {
         global $conn;
-        $sql = "SELECT books.*, categories.name AS category_name
-                FROM books
-                LEFT JOIN categories ON books.category_id = categories.id
-                ORDER BY books.id DESC";
+        $sql = "SELECT books.*, categories.name AS category_name 
+            FROM books 
+            LEFT JOIN categories ON books.category_id = categories.id ";
+
+    // Gunakan switch untuk sorting
+    switch ($sort) {
+        case 'title_asc':
+            $sql .= "ORDER BY books.title ASC";
+            break;
+        case 'title_desc':
+            $sql .= "ORDER BY books.title DESC";
+            break;
+        case 'newest':
+            $sql .= "ORDER BY books.id DESC";
+            break;
+        case 'oldest':
+            $sql .= "ORDERBY books.id ASC"; // <-- salah ketik disini? harus pakai spasi.
+            break;
+        default:
+            $sql .= "ORDER BY books.id DESC";
+            break;
+    }
+
         return $conn->query($sql);
     }
 
@@ -20,15 +39,15 @@ class BookController {
     }
 
     // Tambah buku (prepared statement)
-    public static function addBook($title, $author, $publisher, $category_id, $publish_date, $stock) {
+    public static function addBook($title, $author, $publisher, $category_id, $publish_date, $stock, $cover = null ) {
         global $conn;
-        $stmt = $conn->prepare("INSERT INTO books (title, author, publisher, category_id, publish_date, stock)
-                                VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO books (title, author, publisher, category_id, publish_date, stock, cover)
+                                VALUES (?, ?, ?, ?, ?, ?, ?)");
         if (!$stmt) {
             throw new Exception("Prepare addBook failed: " . $conn->error);
         }
-        // types: s (title), s (author), s (publisher), i (category_id), s (publish_date), i (stock)
-        $stmt->bind_param("sssisi", $title, $author, $publisher, $category_id, $publish_date, $stock);
+        // types: s (title), s (author), s (publisher), i (category_id), s (publish_date), i (stock), s (cover)
+        $stmt->bind_param("sssisis", $title, $author, $publisher, $category_id, $publish_date, $stock, $cover);
         $ok = $stmt->execute();
         if (!$ok) {
             throw new Exception("Execute addBook failed: " . $stmt->error);
@@ -38,21 +57,38 @@ class BookController {
     }
 
     // Update buku
-    public static function updateBook($id, $title, $author, $publisher, $category_id, $publish_date, $stock) {
-        global $conn;
-        $stmt = $conn->prepare("UPDATE books SET title=?, author=?, publisher=?, category_id=?, publish_date=?, stock=? WHERE id=?");
+    public static function updateBook($id, $title, $author, $publisher, $category_id, $publish_date, $stock, $cover = null) {
+    global $conn;
+
+    if ($cover) {
+        // Jika user upload cover baru
+        $stmt = $conn->prepare("UPDATE books 
+            SET title=?, author=?, publisher=?, category_id=?, publish_date=?, stock=?, cover=? 
+            WHERE id=?");
         if (!$stmt) {
             throw new Exception("Prepare updateBook failed: " . $conn->error);
         }
-        // types: s s s i s i i
-        $stmt->bind_param("sssisii", $title, $author, $publisher, $category_id, $publish_date, $stock, $id);
-        $ok = $stmt->execute();
-        if (!$ok) {
-            throw new Exception("Execute updateBook failed: " . $stmt->error);
+        $stmt->bind_param("sssisisi", $title, $author, $publisher, $category_id, $publish_date, $stock, $cover, $id);
+    } else {
+        // Jika tidak ada cover baru
+        $stmt = $conn->prepare("UPDATE books 
+            SET title=?, author=?, publisher=?, category_id=?, publish_date=?, stock=? 
+            WHERE id=?");
+        if (!$stmt) {
+            throw new Exception("Prepare updateBook failed: " . $conn->error);
         }
-        $stmt->close();
-        return $ok;
+        $stmt->bind_param("sssisii", $title, $author, $publisher, $category_id, $publish_date, $stock, $id);
     }
+
+    $ok = $stmt->execute();
+    if (!$ok) {
+        throw new Exception("Execute updateBook failed: " . $stmt->error);
+    }
+
+    $stmt->close();
+    return $ok;
+}
+
 
     // Hapus buku
     public static function deleteBook($id) {
