@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../controllers/BookController.php';
 require_once __DIR__ . '/../../controllers/CategoriesController.php';
 
-// Tambah buku
+// Folder upload cover
 $upload_dir = __DIR__ . '/../../uploads/covers/';
 if (!file_exists($upload_dir)) mkdir($upload_dir, 0777, true);
 
@@ -21,7 +21,8 @@ if (isset($_POST['add'])) {
         $_POST['category'],
         $_POST['publish_date'],
         $_POST['stock'],
-        $cover_name
+        $cover_name,
+        $_POST['status']
     );
     header("Location: ../public/dashboard_admin.php?page=books");
     exit();
@@ -43,7 +44,8 @@ if (isset($_POST['update'])) {
         $_POST['category'],
         $_POST['publish_date'],
         $_POST['stock'],
-        $cover_name
+        $cover_name,
+        $_POST['status']
     );
     header("Location: ../public/dashboard_admin.php?page=books");
     exit();
@@ -57,7 +59,7 @@ if (isset($_GET['delete'])) {
 }
 
 // Ambil data buku & kategori
-$sort = isset($_GET['sort']) ? $_GET['sort'] : '';
+$sort = $_GET['sort'] ?? '';
 $books = BookController::getAllBooks($sort);
 $categories = CategoriesController::getAllCategories();
 ?>
@@ -67,11 +69,8 @@ $categories = CategoriesController::getAllCategories();
 
 <div class="books-container">
     <h1>Kelola Buku</h1>
+    <button type="button" class="action-btn update-btn" onclick="openAddModal()">+ Tambah Buku</button>
 
-   <!-- Tombol Tambah Buku -->
-<button type="button" class="action-btn update-btn" onclick="openAddModal()">+ Tambah Buku</button>
-
-    <!-- Daftar Buku -->
     <h3>Daftar Buku</h3>
     <table class="books-table">
         <tr>
@@ -82,80 +81,82 @@ $categories = CategoriesController::getAllCategories();
             <th>Kategori</th>
             <th>Tanggal Terbit</th>
             <th>Stok</th>
+            <th>Status</th>
             <th>Aksi</th>
         </tr>
-        <?php while ($row = $books->fetch_assoc()): ?>
-        <tr>
-            <td><?php if (!empty($row['cover'])): ?>
-            <img src="../uploads/covers/<?= htmlspecialchars($row['cover']) ?>" width="60" height="80" style="object-fit:cover;border-radius:4px;">
-            <?php else: ?>
-            <span>-</span>
-            <?php endif; ?>
-            </td>
-            <td><?= htmlspecialchars($row['title']) ?></td>
-            <td><?= htmlspecialchars($row['author']) ?></td>
-            <td><?= htmlspecialchars($row['publisher']) ?></td>
-            <td><?= htmlspecialchars($row['category_name'] ?? '-') ?></td>
-            <td><?= htmlspecialchars($row['publish_date']) ?></td>
-            <td><?= htmlspecialchars($row['stock']) ?></td>
-            <td>
-    <button type="button" class="action-btn update-btn"
-        onclick="openEditModal(
-            '<?= $row['id'] ?>',
-            '<?= htmlspecialchars($row['title'], ENT_QUOTES) ?>',
-            '<?= htmlspecialchars($row['author'], ENT_QUOTES) ?>',
-            '<?= htmlspecialchars($row['publisher'], ENT_QUOTES) ?>',
-            '<?= $row['category_id'] ?>',
-            '<?= $row['publish_date'] ?>',
-            '<?= $row['stock'] ?>'
-        )">
-        Edit
-    </button>
-    <a href="../public/dashboard_admin.php?page=books&delete=<?= $row['id'] ?>" 
-       class="action-btn delete-btn"
-       onclick="return confirm('Hapus buku ini?')">Hapus</a>
-</td>
-        </tr>
-        <?php endwhile; ?>
+
+        <?php if (!empty($books)): ?>
+            <?php foreach ($books as $row): ?>
+                <tr>
+                    <td>
+                        <?php if (!empty($row['cover'])): ?>
+                            <img src="../uploads/covers/<?= htmlspecialchars($row['cover']); ?>" width="60" height="80" style="object-fit:cover;border-radius:4px;">
+                        <?php else: ?>
+                            <img src="../public/assets/img/no_cover.png" width="60" height="80">
+                        <?php endif; ?>
+                    </td>
+                    <td><?= htmlspecialchars($row['title']); ?></td>
+                    <td><?= htmlspecialchars($row['author']); ?></td>
+                    <td><?= htmlspecialchars($row['publisher']); ?></td>
+                    <td><?= htmlspecialchars($row['category_name'] ?? '-'); ?></td>
+                    <td><?= htmlspecialchars($row['publish_date']); ?></td>
+                    <td><?= htmlspecialchars($row['stock']); ?></td>
+                    <td><?= htmlspecialchars($row['status']); ?></td>
+                    <td>
+                        <button type="button" class="action-btn update-btn"
+                            onclick="openEditModal(
+                                '<?= $row['id'] ?>',
+                                '<?= htmlspecialchars($row['title'], ENT_QUOTES) ?>',
+                                '<?= htmlspecialchars($row['author'], ENT_QUOTES) ?>',
+                                '<?= htmlspecialchars($row['publisher'], ENT_QUOTES) ?>',
+                                '<?= $row['category_id'] ?>',
+                                '<?= $row['publish_date'] ?>',
+                                '<?= $row['stock'] ?>',
+                                '<?= $row['status'] ?>'
+                            )">Edit</button>
+                        <a href="../public/dashboard_admin.php?page=books&delete=<?= $row['id']; ?>"
+                           class="action-btn delete-btn"
+                           onclick="return confirm('Hapus buku ini?')">Hapus</a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr><td colspan="9" style="text-align:center;">Belum ada buku</td></tr>
+        <?php endif; ?>
     </table>
 </div>
 
 <!-- Modal Tambah Buku -->
 <div id="addModal" class="modal" style="display:none;">
   <div class="modal-content">
-        <span class="close" onclick="closeAddModal()">&times;</span>
-        <h3>Tambah Buku</h3>
-    <form method="GET" action="../public/dashboard_admin.php" style="margin-bottom: 15px;">
-    <input type="hidden" name="page" value="books">
-    <label for="sort">Urutkan berdasarkan:</label>
-    <select name="sort" id="sort" onchange="this.form.submit()">
-        <option value="">-- Pilih Urutan --</option>
-        <option value="title_asc" <?= (isset($_GET['sort']) && $_GET['sort'] == 'title_asc') ? 'selected' : '' ?>>Nama (A-Z)</option>
-        <option value="title_desc" <?= (isset($_GET['sort']) && $_GET['sort'] == 'title_desc') ? 'selected' : '' ?>>Nama (Z-A)</option>
-        <option value="newest" <?= (isset($_GET['sort']) && $_GET['sort'] == 'newest') ? 'selected' : '' ?>>Terbaru</option>
-        <option value="oldest" <?= (isset($_GET['sort']) && $_GET['sort'] == 'oldest') ? 'selected' : '' ?>>Terlama</option>
-    </select>
+    <span class="close" onclick="closeAddModal()">&times;</span>
+    <h3>Tambah Buku</h3>
+
+    <form method="POST" enctype="multipart/form-data" class="books-form">
+        <input type="text" name="title" placeholder="Judul Buku" required>
+        <input type="text" name="author" placeholder="Penulis" required>
+        <input type="text" name="publisher" placeholder="Penerbit" required>
+        <select name="category" required>
+            <option value="">-- Pilih Kategori --</option>
+            <?php foreach ($categories as $cat): ?>
+                <option value="<?= $cat['id']; ?>"><?= htmlspecialchars($cat['name']); ?></option>
+            <?php endforeach; ?>
+        </select>
+        <input type="date" name="publish_date" required>
+        <input type="number" name="stock" placeholder="Stok" required>
+        <label for="cover">Cover Buku</label>
+        <input type="file" name="cover" accept="image/*">
+
+        <label for="status">Status</label>
+        <select name="status" required>
+            <option value="Tersedia">Tersedia</option>
+            <option value="Dipinjam">Dipinjam</option>
+            <option value="Tidak Tersedia">Tidak Tersedia</option>
+        </select>
+
+        <button type="submit" name="add" class="btn-primary">Tambah</button>
     </form>
-        <form method="POST" enctype="multipart/form-data" class="books-form">
-                <input type="text" name="title" placeholder="Judul Buku" required>
-                <input type="text" name="author" placeholder="Penulis" required>
-                <input type="text" name="publisher" placeholder="Penerbit" required>
-                <select name="category" required>
-                    <option value="">-- Pilih Kategori --</option>
-                    <?php while ($cat = $categories->fetch_assoc()): ?>
-                        <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
-                    <?php endwhile; ?>
-                </select>
-                <input type="date" name="publish_date" required>
-                <input type="number" name="stock" placeholder="Stok" required>
-
-                <!-- Tambahan baru -->
-                <label for="cover">Cover Buku</label>
-                <input type="file" name="cover" accept="image/*">
-
-                <button type="submit" name="add" class="btn-primary">Tambah</button>
-        </form>
-    </div>
+  </div>
 </div>
 
 <!-- Modal Edit Buku -->
@@ -163,51 +164,42 @@ $categories = CategoriesController::getAllCategories();
   <div class="modal-content">
     <span class="close" onclick="closeEditModal()">&times;</span>
     <h3>Edit Buku</h3>
-        <form method="POST" enctype="multipart/form-data" class="books-form">
-            <input type="hidden" name="id" id="edit_id">
-            <input type="text" name="title" id="edit_title" required>
-            <input type="text" name="author" id="edit_author" required>
-            <input type="text" name="publisher" id="edit_publisher" required>
-            <select name="category" id="edit_category" required>
-                <option value="">-- Pilih Kategori --</option>
-                <?php
-                $categories2 = CategoriesController::getAllCategories();
-                while ($cat = $categories2->fetch_assoc()): ?>
-                    <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
-                <?php endwhile; ?>
-            </select>
-            <input type="date" name="publish_date" id="edit_publish_date" required>
-            <input type="number" name="stock" id="edit_stock" required>
 
-            <!-- Tambahan baru -->
-            <label for="cover">Ganti Cover (opsional)</label>
-            <input type="file" name="cover" accept="image/*">
+    <form method="POST" enctype="multipart/form-data" class="books-form">
+        <input type="hidden" name="id" id="edit_id">
+        <input type="text" name="title" id="edit_title" required>
+        <input type="text" name="author" id="edit_author" required>
+        <input type="text" name="publisher" id="edit_publisher" required>
 
-            <button type="submit" name="update">Update</button>
-        </form>
-    </div>
+        <select name="category" id="edit_category" required>
+            <option value="">-- Pilih Kategori --</option>
+            <?php foreach ($categories as $cat): ?>
+                <option value="<?= $cat['id']; ?>"><?= htmlspecialchars($cat['name']); ?></option>
+            <?php endforeach; ?>
+        </select>
+
+        <input type="date" name="publish_date" id="edit_publish_date" required>
+        <input type="number" name="stock" id="edit_stock" required>
+        <label for="cover">Ganti Cover (opsional)</label>
+        <input type="file" name="cover" accept="image/*">
+
+        <label for="status">Status</label>
+        <select name="status" id="edit_status" required>
+            <option value="Tersedia">Tersedia</option>
+            <option value="Dipinjam">Dipinjam</option>
+            <option value="Tidak Tersedia">Tidak Tersedia</option>
+        </select>
+
+        <button type="submit" name="update">Update</button>
+    </form>
+  </div>
 </div>
 
 <script>
-    function openAddModal() {
-    console.log("Modal Tambah dibuka"); // debug
-    document.getElementById("addModal").style.display = "block";
-}
+function openAddModal() { document.getElementById("addModal").style.display = "block"; }
+function closeAddModal() { document.getElementById("addModal").style.display = "none"; }
 
-function closeAddModal() {
-    document.getElementById("addModal").style.display = "none";
-}
-
-window.onclick = function(event) {
-    let modal = document.getElementById("addModal");
-    if (event.target === modal) {
-        modal.style.display = "none";
-    }
-}
-
-function openEditModal(id, title, author, publisher, category, publish_date, stock) {
-    console.log("Modal Edit dibuka:", id, title); // Debug
-
+function openEditModal(id, title, author, publisher, category, publish_date, stock, status) {
     document.getElementById("edit_id").value = id;
     document.getElementById("edit_title").value = title;
     document.getElementById("edit_author").value = author;
@@ -215,19 +207,8 @@ function openEditModal(id, title, author, publisher, category, publish_date, sto
     document.getElementById("edit_category").value = category;
     document.getElementById("edit_publish_date").value = publish_date;
     document.getElementById("edit_stock").value = stock;
-
+    document.getElementById("edit_status").value = status;
     document.getElementById("editModal").style.display = "block";
 }
-
-function closeEditModal() {
-    document.getElementById("editModal").style.display = "none";
-}
-
-// Tutup modal jika klik luar
-window.onclick = function(event) {
-    let modal = document.getElementById("editModal");
-    if (event.target === modal) {
-        modal.style.display = "none";
-    }
-}
+function closeEditModal() { document.getElementById("editModal").style.display = "none"; }
 </script>

@@ -6,6 +6,8 @@ class CategoriesController {
         global $conn;
         $query = "SELECT * FROM categories ORDER BY id DESC";
         return $conn->query($query);
+        $result = $conn->query("SELECT * FROM categories ORDER BY name ASC");
+        return $result->fetch_all(MYSQLI_ASSOC);
     }
 
     public static function addCategory($name) {
@@ -28,5 +30,7 @@ class CategoriesController {
         $stmt->bind_param("i", $id);
         return $stmt->execute();
     }
+
+    
 }
     
