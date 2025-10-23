@@ -22,25 +22,12 @@ foreach ($categories as $category) {
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard User - Perpustakaan</title>
-    <link rel="stylesheet" href="assets/css/user_dashboard.css">
+    <title>Perpustakaan</title>
+    <link rel="stylesheet" href="assets/css/user/users_dashboard.css">
 </head>
 <body>
     <!-- Header -->
-    <header class="navbar">
-            <div class="navbar-left">
-                <img src="../uploads/users/default.png" alt="Logo" class="logo">
-                <h1>Perpustakaan</h1>
-            </div>
-            <div class="navbar-center">
-                <form method="GET" action="search_books.php">
-                    <input type="text" name="q" placeholder="Cari buku, penulis, atau kategori...">
-                </form>
-            </div>
-            <div class="navbar-right">
-                <img src="../uploads/users/<?= htmlspecialchars($_SESSION['photo'] ?? 'default.png'); ?>" alt="User" class="user-photo">
-            </div>
-    </header>
+    <?php include __DIR__ . '/../templates/header.php'; ?>
     <!-- Welcome -->
     <section class="welcome">
         <h2>Selamat Datang, <?= htmlspecialchars($username); ?> 👋</h2>
@@ -65,7 +52,12 @@ foreach ($categories as $category) {
                         foreach (array_slice($books, 0, 5) as $book): ?>
                             <div class="book-card">
                                 <div class="book-image">
-                                    <img src="../uploads/covers/<?= htmlspecialchars($book['cover'] ?: 'no_cover.png'); ?>" alt="Cover Buku">
+                                    <a href="/reca/perpustakaan/public/dashboard_user.php?page=book_detail&id=<?= $book['id']; ?>">
+    <img src="../uploads/covers/<?= htmlspecialchars($book['cover'] ?: 'no_cover.png'); ?>" 
+         alt="Cover Buku">
+</a>
+
+
                                     <?php if (!empty($book['status']) && $book['status'] === 'Dipinjam'): ?>
                                         <span class="status-label">Dipinjam</span>
                                     <?php endif; ?>
@@ -82,7 +74,7 @@ foreach ($categories as $category) {
     </main>
 
     <footer>
-        <a href="../../public/logout.php">Logout</a>
+        <a href="logout.php">Logout</a>
     </footer>
 </body>
 </html>

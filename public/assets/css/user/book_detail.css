@@ -1,0 +1,127 @@
+/* === NAVBAR UMUM === */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    padding: 10px 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    font-family: "Poppins", sans-serif;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.navbar-left img.logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+}
+
+.navbar-center form {
+    display: flex;
+    align-items: center;
+    background: #f3f3f3;
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+.navbar-center input {
+    border: none;
+    outline: none;
+    padding: 6px 12px;
+    background: transparent;
+    width: 250px;
+}
+
+.navbar-right {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* === FOTO USER === */
+.user-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.3s;
+    object-fit: cover;
+}
+.user-photo:hover {
+    transform: scale(1.05);
+}
+
+/* === DROPDOWN USER === */
+.user-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 55px;
+    background: #fff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    width: 270px;
+    overflow: hidden;
+    animation: fadeIn 0.3s ease;
+}
+
+.user-dropdown.show {
+    display: block;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    gap: 10px;
+}
+
+.user-photo-small {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-dropdown ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.user-dropdown ul li {
+    border-top: 1px solid #f0f0f0;
+}
+
+.user-dropdown ul li a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #333;
+    text-decoration: none;
+    padding: 12px 18px;
+    transition: background 0.2s;
+    font-size: 14px;
+}
+
+.user-dropdown ul li a:hover {
+    background: #f8f8f8;
+}
+
+.logout-link {
+    color: red !important;
+    font-weight: 500;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(-10px);}
+    to {opacity: 1; transform: translateY(0);}
+}

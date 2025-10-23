@@ -45,16 +45,19 @@ class BookController {
     }
 
       // Tambah buku (dengan kolom status)
-    public static function addBook($title, $author, $publisher, $category_id, $publish_date, $stock, $cover = null, $status = 'Tersedia') {
+      public static function addBook($title, $author, $publisher, $category_id, $publish_date, $stock, $description, $cover = null, $status = 'Tersedia') {
         global $conn;
-        $stmt = $conn->prepare("INSERT INTO books (title, author, publisher, category_id, publish_date, stock, cover, status)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+
+        $stmt = $conn->prepare("INSERT INTO books (title, author, publisher, category_id, publish_date, stock, description, cover, status)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
         if (!$stmt) {
             throw new Exception("Prepare addBook failed: " . $conn->error);
         }
 
-        // urutan: sss is i s s (string, string, string, int, string, int, string, string)
-        $stmt->bind_param("sssisiss", $title, $author, $publisher, $category_id, $publish_date, $stock, $cover, $status);
+        // Format bind_param: s = string, i = integer
+        $stmt->bind_param("sssisssss", $title, $author, $publisher, $category_id, $publish_date, $stock, $description, $cover, $status);
+
         $ok = $stmt->execute();
 
         if (!$ok) {
@@ -65,29 +68,35 @@ class BookController {
         return $ok;
     }
 
-    // Update buku (dengan kolom status)
-    public static function updateBook($id, $title, $author, $publisher, $category_id, $publish_date, $stock, $cover = null, $status = 'Tersedia') {
+    // ✅ Update buku (dengan kolom description dan status)
+    public static function updateBook($id, $title, $author, $publisher, $category_id, $publish_date, $stock, $description, $cover = null, $status = 'Tersedia') {
         global $conn;
 
         if ($cover) {
             $stmt = $conn->prepare("UPDATE books 
-                SET title=?, author=?, publisher=?, category_id=?, publish_date=?, stock=?, cover=?, status=? 
+                SET title=?, author=?, publisher=?, category_id=?, publish_date=?, stock=?, description=?, cover=?, status=? 
                 WHERE id=?");
+            
             if (!$stmt) {
                 throw new Exception("Prepare updateBook failed: " . $conn->error);
             }
-            $stmt->bind_param("sssisissi", $title, $author, $publisher, $category_id, $publish_date, $stock, $cover, $status, $id);
+
+            $stmt->bind_param("sssisssssi", $title, $author, $publisher, $category_id, $publish_date, $stock, $description, $cover, $status, $id);
+
         } else {
             $stmt = $conn->prepare("UPDATE books 
-                SET title=?, author=?, publisher=?, category_id=?, publish_date=?, stock=?, status=? 
+                SET title=?, author=?, publisher=?, category_id=?, publish_date=?, stock=?, description=?, status=? 
                 WHERE id=?");
+            
             if (!$stmt) {
                 throw new Exception("Prepare updateBook failed: " . $conn->error);
             }
-            $stmt->bind_param("sssisisi", $title, $author, $publisher, $category_id, $publish_date, $stock, $status, $id);
+
+            $stmt->bind_param("sssissssi", $title, $author, $publisher, $category_id, $publish_date, $stock, $description, $status, $id);
         }
 
         $ok = $stmt->execute();
+
         if (!$ok) {
             throw new Exception("Execute updateBook failed: " . $stmt->error);
         }
@@ -96,6 +105,7 @@ class BookController {
         return $ok;
     }
 
+    // ✅ Fungsi lain tetap sama seperti sebelumnya (getAllBooks, deleteBook, searchBooks, getBooksByCategory, dll)
 
     // Hapus buku
     public static function deleteBook($id) {
