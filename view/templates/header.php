@@ -8,7 +8,7 @@ if (session_status() === PHP_SESSION_NONE) {
 <header class="navbar">
     <div class="navbar-left">
         <img src="/reca/perpustakaan/uploads/logo/logo.jpg" alt="Logo" class="logo">
-        <h1>Perpustakaan</h1>
+        <h1><a href="/reca/perpustakaan/public/dashboard_user.php" class="home-link">Perpustakaan</a></h1>
     </div>
 
     <div class="navbar-center">

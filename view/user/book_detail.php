@@ -35,7 +35,7 @@ if (!$book) {
 <body>
     <!-- Header -->
     <?php include __DIR__ . '/../templates/header.php'; ?>
-<div class="book-detail-container">
+    <div class="book-detail-container">
     <div class="book-cover">
         <img src="../uploads/covers/<?= htmlspecialchars($book['cover'] ?: 'no_cover.png'); ?>" alt="Cover Buku">
     </div>
@@ -46,7 +46,6 @@ if (!$book) {
         <p><span>Penerbit:</span> <?= htmlspecialchars($book['publisher']); ?></p>
         <p><span>Kategori:</span> <?= htmlspecialchars($book['category_name']); ?></p>
         <p><span>Tanggal Terbit:</span> <?= htmlspecialchars($book['publish_date']); ?></p>
-        <p><span>Stok:</span> <?= htmlspecialchars($book['stock']); ?></p>
         <p><span>Status:</span> 
             <span class="status <?= strtolower($book['status']); ?>">
                 <?= htmlspecialchars($book['status']); ?>

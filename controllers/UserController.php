@@ -29,4 +29,28 @@ class UserController {
         $stmt->bind_param("i", $id);
         return $stmt->execute();
     }
+
+    public static function getUserById($id) {
+    global $conn;
+    $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc();
+}
+
+    public static function updateUserProfile($id, $username, $email, $password = null, $photo = null) {
+        global $conn;
+
+        if ($password) {
+            $stmt = $conn->prepare("UPDATE users SET username=?, email=?, password=?, photo=? WHERE id=?");
+            $stmt->bind_param("ssssi", $username, $email, $password, $photo, $id);
+        } else {
+            $stmt = $conn->prepare("UPDATE users SET username=?, email=?, photo=? WHERE id=?");
+            $stmt->bind_param("sssi", $username, $email, $photo, $id);
+        }
+
+        return $stmt->execute();
+    }
+
 }

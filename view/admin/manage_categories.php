@@ -26,7 +26,7 @@ $categories = CategoriesController::getAllCategories();
 ?>
 
 <base href="/reca/perpustakaan/public/">
-<link rel="stylesheet" href="assets/css/books.css"> <!-- pakai css buku biar konsisten -->
+<link rel="stylesheet" href="assets/css/admin/books.css"> <!-- pakai css buku biar konsisten -->
 
 <div class="books-container">
     <h1>Kelola Kategori</h1>

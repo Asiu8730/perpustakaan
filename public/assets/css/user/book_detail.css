@@ -1,127 +1,142 @@
-/* === NAVBAR UMUM === */
-.navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #fff;
-    padding: 10px 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    font-family: "Poppins", sans-serif;
-}
-
-.navbar-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.navbar-left img.logo {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-}
-
-.navbar-center form {
-    display: flex;
-    align-items: center;
-    background: #f3f3f3;
-    padding: 5px 10px;
-    border-radius: 20px;
-}
-
-.navbar-center input {
-    border: none;
-    outline: none;
-    padding: 6px 12px;
-    background: transparent;
-    width: 250px;
-}
-
-.navbar-right {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-/* === FOTO USER === */
-.user-photo {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: 0.3s;
-    object-fit: cover;
-}
-.user-photo:hover {
-    transform: scale(1.05);
-}
-
-/* === DROPDOWN USER === */
-.user-dropdown {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 55px;
-    background: #fff;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    border-radius: 10px;
-    width: 270px;
-    overflow: hidden;
-    animation: fadeIn 0.3s ease;
-}
-
-.user-dropdown.show {
-    display: block;
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    gap: 10px;
-}
-
-.user-photo-small {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.user-dropdown ul {
-    list-style: none;
+/* ===== Reset bawaan browser ===== */
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
-.user-dropdown ul li {
-    border-top: 1px solid #f0f0f0;
-}
-
-.user-dropdown ul li a {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+html, body {
+    font-family: "Poppins", Arial, sans-serif;
+    background-color: #f9fafc;
     color: #333;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+/* ===== Container utama ===== */
+.book-detail-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+    display: flex;
+    gap: 40px;
+    padding: 30px;
+}
+
+/* ===== Gambar buku ===== */
+.book-cover {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.book-cover img {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* ===== Detail buku ===== */
+.book-info {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.book-info h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 10px;
+}
+
+.book-info p {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+/* ===== Label status ===== */
+.book-status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-top: 8px;
+}
+
+.status-tersedia {
+    background-color: #c8f7c5;
+    color: #2e7d32;
+}
+
+.status-dipinjam {
+    background-color: #ffe0b2;
+    color: #e65100;
+}
+
+.status-tidak-tersedia {
+    background-color: #ffcdd2;
+    color: #b71c1c;
+}
+
+/* ===== Tombol pinjam ===== */
+.borrow-btn {
+    display: inline-block;
+    background-color: #0069d9;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
     text-decoration: none;
-    padding: 12px 18px;
-    transition: background 0.2s;
-    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.3s ease;
+    text-align: center;
+    width: fit-content;
 }
 
-.user-dropdown ul li a:hover {
-    background: #f8f8f8;
+.borrow-btn:hover {
+    background-color: #004a9f;
 }
 
-.logout-link {
-    color: red !important;
-    font-weight: 500;
+/* ===== Deskripsi ===== */
+.book-description {
+    margin-top: 20px;
+    font-size: 1rem;
+    color: #444;
+    line-height: 1.7;
 }
 
-@keyframes fadeIn {
-    from {opacity: 0; transform: translateY(-10px);}
-    to {opacity: 1; transform: translateY(0);}
+/* ===== Tombol kembali ===== */
+.back-link {
+    display: inline-block;
+    margin-top: 20px;
+    font-size: 0.95rem;
+    color: #0069d9;
+    text-decoration: none;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/* ===== Responsif ===== */
+@media (max-width: 768px) {
+    .book-detail-container {
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .book-cover img {
+        max-width: 250px;
+    }
 }

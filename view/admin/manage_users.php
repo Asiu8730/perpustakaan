@@ -26,7 +26,7 @@ $users = UserController::getAllUsers();
 ?>
 
 <base href="/reca/perpustakaan/public/">
-<link rel="stylesheet" href="assets/css/books.css"> <!-- gunakan css buku biar sama -->
+<link rel="stylesheet" href="assets/css/admin/books.css">    <!-- gunakan css buku biar sama -->
 
 <div class="books-container"> <!-- pakai class yang sama biar konsisten -->
     <h1>Kelola User</h1>

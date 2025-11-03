@@ -15,15 +15,15 @@ if (isset($_POST['add'])) {
     }
 
     BookController::addBook(
-        $_POST['title'],
-        $_POST['author'],
-        $_POST['publisher'],
-        $_POST['category'],
-        $_POST['publish_date'],
-        $_POST['stock'],
-        $cover_name,
-        $_POST['status']
-    );
+    $_POST['title'],
+    $_POST['author'],
+    $_POST['publisher'],
+    $_POST['category'],
+    $_POST['publish_date'],
+    $_POST['description'] ?? '', // tambahkan deskripsi
+    $cover_name, // bisa null
+    $_POST['status']
+);
     header("Location: ../public/dashboard_admin.php?page=books");
     exit();
 }
@@ -43,7 +43,7 @@ if (isset($_POST['update'])) {
         $_POST['publisher'],
         $_POST['category'],
         $_POST['publish_date'],
-        $_POST['stock'],
+        $_POST['description'],
         $cover_name,
         $_POST['status']
     );
@@ -65,7 +65,7 @@ $categories = CategoriesController::getAllCategories();
 ?>
 
 <base href="/reca/perpustakaan/public/">
-<link rel="stylesheet" href="assets/css/books.css">
+<link rel="stylesheet" href="assets/css/admin/books.css">
 
 <div class="books-container">
     <h1>Kelola Buku</h1>
@@ -73,58 +73,58 @@ $categories = CategoriesController::getAllCategories();
 
     <h3>Daftar Buku</h3>
     <table class="books-table">
-        <tr>
-            <th>Cover</th>
-            <th>Judul</th>
-            <th>Penulis</th>
-            <th>Penerbit</th>
-            <th>Kategori</th>
-            <th>Tanggal Terbit</th>
-            <th>Stok</th>
-            <th>Status</th>
-            <th>Aksi</th>
-        </tr>
+    <tr>
+        <th>Cover</th>
+        <th>Judul</th>
+        <th>Penulis</th>
+        <th>Penerbit</th>
+        <th>Kategori</th>
+        <th>Tanggal Terbit</th>
+        <th>Deskripsi</th>
+        <th>Status</th>
+        <th>Aksi</th>
+    </tr>
 
-        <?php if (!empty($books)): ?>
-            <?php foreach ($books as $row): ?>
-                <tr>
-                    <td>
-                        <?php if (!empty($row['cover'])): ?>
-                            <img src="../uploads/covers/<?= htmlspecialchars($row['cover']); ?>" width="60" height="80" style="object-fit:cover;border-radius:4px;">
-                        <?php else: ?>
-                            <img src="../public/assets/img/no_cover.png" width="60" height="80">
-                        <?php endif; ?>
-                    </td>
-                    <td><?= htmlspecialchars($row['title']); ?></td>
-                    <td><?= htmlspecialchars($row['author']); ?></td>
-                    <td><?= htmlspecialchars($row['publisher']); ?></td>
-                    <td><?= htmlspecialchars($row['category_name'] ?? '-'); ?></td>
-                    <td><?= htmlspecialchars($row['publish_date']); ?></td>
-                    <td><?= htmlspecialchars($row['stock']); ?></td>
-                    <td><?= htmlspecialchars($row['status']); ?></td>
-                    <td>
-                        <button type="button" class="action-btn update-btn"
-                            onclick="openEditModal(
-                                '<?= $row['id'] ?>',
-                                '<?= htmlspecialchars($row['title'], ENT_QUOTES) ?>',
-                                '<?= htmlspecialchars($row['author'], ENT_QUOTES) ?>',
-                                '<?= htmlspecialchars($row['publisher'], ENT_QUOTES) ?>',
-                                '<?= $row['category_id'] ?>',
-                                '<?= $row['publish_date'] ?>',
-                                '<?= $row['stock'] ?>',
-                                '<?= $row['status'] ?>'
-                            )">Edit</button>
-                        <a href="../public/dashboard_admin.php?page=books&delete=<?= $row['id']; ?>"
-                           class="action-btn delete-btn"
-                           onclick="return confirm('Hapus buku ini?')">Hapus</a>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <tr><td colspan="9" style="text-align:center;">Belum ada buku</td></tr>
-        <?php endif; ?>
-    </table>
-</div>
+    <?php if (!empty($books)): ?>
+        <?php foreach ($books as $row): ?>
+            <tr>
+                <td>
+                    <?php if (!empty($row['cover'])): ?>
+                        <img src="../uploads/covers/<?= htmlspecialchars($row['cover']); ?>" width="60" height="80" style="object-fit:cover;border-radius:4px;">
+                    <?php else: ?>
+                        <img src="../public/assets/img/no_cover.png" width="60" height="80">
+                    <?php endif; ?>
+                </td>
+                <td><?= htmlspecialchars($row['title']); ?></td>
+                <td><?= htmlspecialchars($row['author']); ?></td>
+                <td><?= htmlspecialchars($row['publisher']); ?></td>
+                <td><?= htmlspecialchars($row['category_name'] ?? '-'); ?></td>
+                <td><?= htmlspecialchars($row['publish_date']); ?></td>
+                <td style="max-width:200px;"><?= nl2br(htmlspecialchars($row['description'] ?? '-')); ?></td>
+                <td><?= htmlspecialchars($row['status']); ?></td>
+                <td>
+                    <button type="button" class="action-btn update-btn"
+                        onclick="openEditModal(
+                            '<?= $row['id'] ?>',
+                            '<?= htmlspecialchars($row['title'], ENT_QUOTES) ?>',
+                            '<?= htmlspecialchars($row['author'], ENT_QUOTES) ?>',
+                            '<?= htmlspecialchars($row['publisher'], ENT_QUOTES) ?>',
+                            '<?= $row['category_id'] ?>',
+                            '<?= $row['publish_date'] ?>',
+                            '<?= htmlspecialchars($row['description'], ENT_QUOTES) ?>',
+                            '<?= $row['status'] ?>'
+                        )">Edit</button>
+                    <a href="../public/dashboard_admin.php?page=books&delete=<?= $row['id']; ?>"
+                       class="action-btn delete-btn"
+                       onclick="return confirm('Hapus buku ini?')">Hapus</a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <tr><td colspan="9" style="text-align:center;">Belum ada buku</td></tr>
+    <?php endif; ?>
+</table>
+
 
 <!-- Modal Tambah Buku -->
 <div id="addModal" class="modal" style="display:none;">
@@ -143,14 +143,16 @@ $categories = CategoriesController::getAllCategories();
             <?php endforeach; ?>
         </select>
         <input type="date" name="publish_date" required>
-        <input type="number" name="stock" placeholder="Stok" required>
+
+        <label for="description">Deskripsi Buku</label>
+        <textarea name="description" rows="3" placeholder="Tulis deskripsi buku..." required></textarea>
+
         <label for="cover">Cover Buku</label>
-        <input type="file" name="cover" accept="image/*">
+        <input type="file" name="cover" accept="image/*" required>
 
         <label for="status">Status</label>
         <select name="status" required>
             <option value="Tersedia">Tersedia</option>
-            <option value="Dipinjam">Dipinjam</option>
             <option value="Tidak Tersedia">Tidak Tersedia</option>
         </select>
 
@@ -179,14 +181,16 @@ $categories = CategoriesController::getAllCategories();
         </select>
 
         <input type="date" name="publish_date" id="edit_publish_date" required>
-        <input type="number" name="stock" id="edit_stock" required>
+
+        <label for="description">Deskripsi Buku</label>
+        <textarea name="description" id="edit_description" rows="3" required></textarea>
+
         <label for="cover">Ganti Cover (opsional)</label>
         <input type="file" name="cover" accept="image/*">
 
         <label for="status">Status</label>
         <select name="status" id="edit_status" required>
             <option value="Tersedia">Tersedia</option>
-            <option value="Dipinjam">Dipinjam</option>
             <option value="Tidak Tersedia">Tidak Tersedia</option>
         </select>
 
@@ -199,14 +203,14 @@ $categories = CategoriesController::getAllCategories();
 function openAddModal() { document.getElementById("addModal").style.display = "block"; }
 function closeAddModal() { document.getElementById("addModal").style.display = "none"; }
 
-function openEditModal(id, title, author, publisher, category, publish_date, stock, status) {
+function openEditModal(id, title, author, publisher, category, publish_date, description, status) {
     document.getElementById("edit_id").value = id;
     document.getElementById("edit_title").value = title;
     document.getElementById("edit_author").value = author;
     document.getElementById("edit_publisher").value = publisher;
     document.getElementById("edit_category").value = category;
     document.getElementById("edit_publish_date").value = publish_date;
-    document.getElementById("edit_stock").value = stock;
+    document.getElementById("edit_description").value = description;
     document.getElementById("edit_status").value = status;
     document.getElementById("editModal").style.display = "block";
 }

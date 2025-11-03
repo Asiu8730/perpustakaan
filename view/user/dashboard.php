@@ -1,15 +1,16 @@
 <?php
+
+
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../controllers/BookController.php';
 require_once __DIR__ . '/../../controllers/CategoriesController.php';
-
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'user') {
     header("Location: ../../public/login.php");
     exit();
 }
 
-$username = $_SESSION['username'];
+$username = $_SESSION['username'] ?? 'User';
 $categories = CategoriesController::getAllCategories();
 $booksByCategory = [];
 
@@ -17,7 +18,6 @@ foreach ($categories as $category) {
     $booksByCategory[$category['id']] = BookController::getBooksByCategory($category['id']);
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>

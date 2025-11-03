@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Dashboard Admin</title>
-    <link rel="stylesheet" href="../public/assets/css/navbar.css">
+    <link rel="stylesheet" href="../public/assets/css/admin/navbar.css">
 </head>
 <body>
     <!-- Sidebar -->
