@@ -117,4 +117,11 @@ class BookController {
         $res = $stmt->get_result();
         return $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
     }
+
+    public static function setStatus($id, $status) {
+        global $conn;
+        $stmt = $conn->prepare("UPDATE books SET status=? WHERE id=?");
+        $stmt->bind_param("si", $status, $id);
+        return $stmt->execute();
+    }
 }

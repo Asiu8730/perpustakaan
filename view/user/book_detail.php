@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../controllers/BookController.php';
 
+if (!isset($_SESSION)) session_start();
+
 if (!isset($_GET['id'])) {
     echo "<p>ID Buku tidak ditemukan.</p>";
     exit();
@@ -23,6 +25,24 @@ if (!$book) {
     echo "<p>Buku tidak ditemukan.</p>";
     exit();
 }
+
+// Jika tombol 'pinjam' diklik → tambahkan ke keranjang
+if (isset($_POST['add_to_cart'])) {
+    if (!isset($_SESSION['cart'])) {
+        $_SESSION['cart'] = [];
+    }
+
+    // Hindari duplikasi buku di keranjang
+    if (!in_array($id, $_SESSION['cart'])) {
+        $_SESSION['cart'][] = $id;
+        $message = "Buku berhasil ditambahkan ke keranjang.";
+    } else {
+        $message = "Buku sudah ada di keranjang.";
+    }
+
+    header("Location: dashboard_user.php?page=cart");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -35,30 +55,33 @@ if (!$book) {
 <body>
     <!-- Header -->
     <?php include __DIR__ . '/../templates/header.php'; ?>
+
     <div class="book-detail-container">
-    <div class="book-cover">
-        <img src="../uploads/covers/<?= htmlspecialchars($book['cover'] ?: 'no_cover.png'); ?>" alt="Cover Buku">
-    </div>
+        <div class="book-cover">
+            <img src="../uploads/covers/<?= htmlspecialchars($book['cover'] ?: 'no_cover.png'); ?>" alt="Cover Buku">
+        </div>
 
-    <div class="book-info">
-        <h2><?= htmlspecialchars($book['title']); ?></h2>
-        <p><span>Penulis:</span> <?= htmlspecialchars($book['author']); ?></p>
-        <p><span>Penerbit:</span> <?= htmlspecialchars($book['publisher']); ?></p>
-        <p><span>Kategori:</span> <?= htmlspecialchars($book['category_name']); ?></p>
-        <p><span>Tanggal Terbit:</span> <?= htmlspecialchars($book['publish_date']); ?></p>
-        <p><span>Status:</span> 
-            <span class="status <?= strtolower($book['status']); ?>">
-                <?= htmlspecialchars($book['status']); ?>
-            </span>
-        </p>
-        <p><span>Deskripsi:</span><br><?= nl2br(htmlspecialchars($book['description'])); ?></p>
+        <div class="book-info">
+            <h2><?= htmlspecialchars($book['title']); ?></h2>
+            <p><span>Penulis:</span> <?= htmlspecialchars($book['author']); ?></p>
+            <p><span>Penerbit:</span> <?= htmlspecialchars($book['publisher']); ?></p>
+            <p><span>Kategori:</span> <?= htmlspecialchars($book['category_name']); ?></p>
+            <p><span>Tanggal Terbit:</span> <?= htmlspecialchars($book['publish_date']); ?></p>
+            <p><span>Status:</span> 
+                <span class="status <?= strtolower($book['status']); ?>">
+                    <?= htmlspecialchars($book['status']); ?>
+                </span>
+            </p>
+            <p><span>Deskripsi:</span><br><?= nl2br(htmlspecialchars($book['description'])); ?></p>
 
-        <div class="action-buttons">
-            <a href="#" class="borrow-btn">Pinjam Buku</a>
-            <a href="dashboard_user.php" class="back-btn">Kembali</a>
+            <div class="action-buttons">
+                <form method="POST">
+                    <button type="submit" name="add_to_cart" class="borrow-btn">Pinjam Buku</button>
+                    <a href="dashboard_user.php?page=cart&action=add&id=<?= $book['id']; ?>" class="borrow-btn">Tambah ke Keranjang</a>
+                    <a href="dashboard_user.php" class="back-btn">Kembali</a>
+                </form>
+            </div>
         </div>
     </div>
-</div>
-
 </body>
 </html>
