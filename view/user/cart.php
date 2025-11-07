@@ -27,7 +27,9 @@ $books = CartController::getCartItems();
 ?>
 
 <link rel="stylesheet" href="assets/css/user/cart.css">
+<link rel="stylesheet" href="assets/css/global.css">
 
+<?php include __DIR__ . '/../templates/header.php'; ?>
 <div class="cart-container">
     <h1>Keranjang Buku Saya</h1>
 

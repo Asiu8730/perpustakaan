@@ -53,17 +53,33 @@ $borrows = BorrowController::getAllBorrows();
             </td>
             <td>
                 <?php if ($row['status'] === 'dipinjam'): ?>
-                    <button type="button" class="action-btn update-btn"
-                        onclick="openConfirmModal(
-                            '<?= $row['id'] ?>',
-                            '<?= htmlspecialchars($row['title'], ENT_QUOTES) ?>',
-                            '<?= htmlspecialchars($row['username'], ENT_QUOTES) ?>'
-                        )">
-                        Konfirmasi
-                    </button>
-                <?php else: ?>
-                    <span class="status selesai">Selesai</span>
-                <?php endif; ?>
+    <!-- Konfirmasi peminjaman -->
+    <button type="button" class="action-btn update-btn"
+        onclick="openConfirmModal(
+            '<?= $row['id'] ?>',
+            '<?= htmlspecialchars($row['title'], ENT_QUOTES) ?>',
+            '<?= htmlspecialchars($row['username'], ENT_QUOTES) ?>',
+            'peminjaman'
+        )">
+        Konfirmasi Peminjaman
+    </button>
+
+<?php elseif ($row['status'] === 'menunggu_konfirmasi_pengembalian'): ?>
+    <!-- Konfirmasi pengembalian -->
+    <button type="button" class="action-btn update-btn"
+        onclick="openConfirmModal(
+            '<?= $row['id'] ?>',
+            '<?= htmlspecialchars($row['title'], ENT_QUOTES) ?>',
+            '<?= htmlspecialchars($row['username'], ENT_QUOTES) ?>',
+            'pengembalian'
+        )">
+        Konfirmasi Pengembalian
+    </button>
+
+<?php else: ?>
+    <span class="status selesai">Selesai</span>
+<?php endif; ?>
+
             </td>
         </tr>
         <?php endwhile; ?>

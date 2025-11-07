@@ -1,19 +1,29 @@
 <?php
 session_start();
-
-
 require_once __DIR__ . '/../controllers/CartController.php';
 
-if (isset($_GET['page']) && $_GET['page'] === 'cart' && isset($_GET['action'])) {
-    $book_id = intval($_GET['id'] ?? 0);
-    if ($_GET['action'] === 'add' && $book_id > 0) {
-        CartController::addToCart($book_id);
-    } elseif ($_GET['action'] === 'remove') {
-        CartController::removeFromCart($book_id);
+// =====================
+// 🟩 Tambahan untuk AJAX notifikasi keranjang
+// =====================
+if (isset($_GET['page']) && $_GET['page'] === 'cart' && isset($_GET['action']) && $_GET['action'] === 'add' && isset($_GET['id'])) {
+    $book_id = intval($_GET['id']);
+    
+    // Jika request datang dari fetch() → kirim JSON, bukan redirect
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        header('Content-Type: application/json');
+
+        $result = CartController::addToCart($book_id);
+        echo json_encode($result);
+        exit;
     }
+
+    // Jika bukan AJAX → jalankan alur biasa
+    CartController::addToCart($book_id);
 }
 
-
+// =====================
+// 🟦 Logika login dan routing utama
+// =====================
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'user') {
     header("Location: login.php");
     exit();
@@ -31,7 +41,7 @@ switch ($page) {
         $file = $viewPath . 'book_detail.php';
         break;
 
-    case 'borrowed_books':
+    case 'borrowed':
         $file = $viewPath . 'borrowed_books.php';
         break;
 
@@ -43,7 +53,6 @@ switch ($page) {
         $file = $viewPath . 'setting.php';
         break;
 
-    // 🆕 Tambahkan halaman keranjang
     case 'cart':
         $file = $viewPath . 'cart.php';
         break;
@@ -59,3 +68,4 @@ if (file_exists($file)) {
 } else {
     echo "<h3>Halaman tidak ditemukan.</h3>";
 }
+?>

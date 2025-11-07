@@ -24,6 +24,7 @@ foreach ($categories as $category) {
     <meta charset="UTF-8">
     <title>Perpustakaan</title>
     <link rel="stylesheet" href="assets/css/user/users_dashboard.css">
+    <link rel="stylesheet" href="assets/css/global.css">
 </head>
 <body>
     <!-- Header -->

@@ -100,6 +100,7 @@ include __DIR__ . '/../templates/header.php';
 ?>
 
 <link rel="stylesheet" href="/reca/perpustakaan/public/assets/css/user/setting.css">
+<link rel="stylesheet" href="/reca/perpustakaan/public/assets/css/global.css">
 
 <div class="settings-page">
     <div class="setting-container">

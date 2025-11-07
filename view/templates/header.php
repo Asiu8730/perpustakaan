@@ -32,9 +32,10 @@ if (session_status() === PHP_SESSION_NONE) {
                     </div>
                 </div>
                 <ul>
-                    <li><a href="/reca/perpustakaan/public/dashboard_user.php?page=cart">Daftar Pinjam</a></li>
+                    <li><a href="/reca/perpustakaan/public/dashboard_user.php?page=borrowed">Daftar Pinjam</a></li>
+                    <li><a href="/reca/perpustakaan/public/dashboard_user.php?page=cart">Keranjang</a></li>
                     <li><a href="/reca/perpustakaan/public/dashboard_user.php?page=setting">Akun</a></li>
-                    <li><a href="#">Ulasan Buku</a></li>
+                    <li><a href="#">Notifikasi</a></li>
                     <li><a href="/reca/perpustakaan/public/logout.php" class="logout-link">Keluar Akun</a></li>
                 </ul>
             </div>

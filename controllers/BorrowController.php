@@ -62,5 +62,40 @@ class BorrowController {
     return $stmt->execute();
 }
 
+public static function requestReturn($loan_id) {
+    global $conn;
+
+    if (session_status() === PHP_SESSION_NONE) session_start();
+    if (empty($_SESSION['user_id'])) return false;
+
+    $user_id = $_SESSION['user_id'];
+
+    // Update status peminjaman jadi menunggu konfirmasi admin
+    $stmt = $conn->prepare("UPDATE borrows SET status='menunggu_konfirmasi_pengembalian' WHERE id=?");
+    $stmt->bind_param("i", $loan_id);
+    $stmt->execute();
+    $stmt->close();
+
+    // Cari admin
+    $adminQuery = $conn->query("SELECT id FROM users WHERE role='admin' LIMIT 1");
+    if ($adminQuery && $adminQuery->num_rows > 0) {
+        $admin = $adminQuery->fetch_assoc();
+        $admin_id = $admin['id'];
+
+        // Buat notifikasi untuk admin
+        $msg = "User ID $user_id mengajukan pengembalian buku pada peminjaman ID $loan_id";
+        $stmt2 = $conn->prepare("INSERT INTO notifications (user_id, message, created_at) VALUES (?, ?, NOW())");
+        $stmt2->bind_param("is", $admin_id, $msg);
+        $stmt2->execute();
+        $stmt2->close();
+    } else {
+        // Jika admin tidak ditemukan, catat log
+        error_log("Tidak ada admin ditemukan untuk membuat notifikasi pengembalian buku.");
+    }
+
+    return true;
+}
+
+
 }
 ?>
