@@ -7,66 +7,66 @@ require_once __DIR__ . '/../config/database.php';
 class CartController {
 
     public static function addToCart($book_id) {
-        if (!isset($_SESSION['cart'])) {
-            $_SESSION['cart'] = [];
+        global $conn;
+
+        if (!isset($_SESSION['user_id'])) {
+            return ['status' => 'error', 'message' => 'User belum login'];
         }
 
-        if (!in_array($book_id, $_SESSION['cart'])) {
-            $_SESSION['cart'][] = $book_id;
-        }
+        $user_id = $_SESSION['user_id'];
 
-        if (in_array($book_id, $_SESSION['cart'])) {
+        // Cek apakah buku sudah ada di keranjang user
+        $stmt = $conn->prepare("SELECT id FROM carts WHERE user_id = ? AND book_id = ?");
+        $stmt->bind_param("ii", $user_id, $book_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
             return ['status' => 'exists', 'message' => 'Buku sudah ada di keranjang'];
         }
 
-        // ✅ Jika belum ada, tambahkan
-        $_SESSION['cart'][] = $book_id;
-        return ['status' => 'success', 'message' => 'Buku berhasil ditambahkan ke keranjang'];
+        // Tambahkan ke tabel carts
+        $stmt = $conn->prepare("INSERT INTO carts (user_id, book_id, created_at) VALUES (?, ?, NOW())");
+        $stmt->bind_param("ii", $user_id, $book_id);
+
+        if ($stmt->execute()) {
+            return ['status' => 'success', 'message' => 'Buku berhasil ditambahkan ke keranjang'];
+        } else {
+            return ['status' => 'error', 'message' => 'Gagal menambahkan buku ke keranjang'];
+        }
     }
 
     public static function removeFromCart($book_id) {
-        if (isset($_SESSION['cart'])) {
-            $_SESSION['cart'] = array_filter($_SESSION['cart'], fn($id) => $id != $book_id);
-        }
-        $key = array_search($book_id, $_SESSION['cart']);
-        if ($key !== false) {
-            unset($_SESSION['cart'][$key]);
-            $_SESSION['cart'] = array_values($_SESSION['cart']); // reset index
-            return true;
-        }
-        return false;
-    }
-
-    public static function clearCart() {
-        unset($_SESSION['cart']);
+        global $conn;
+        $user_id = $_SESSION['user_id'];
+        $stmt = $conn->prepare("DELETE FROM carts WHERE user_id = ? AND book_id = ?");
+        $stmt->bind_param("ii", $user_id, $book_id);
+        $stmt->execute();
     }
 
     public static function getCartItems() {
         global $conn;
-        if (empty($_SESSION['cart'])) return [];
-        $ids = implode(",", array_map('intval', $_SESSION['cart']));
-        $res = $conn->query("SELECT * FROM books WHERE id IN ($ids)");
-        return $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
-        return $_SESSION['cart'] ?? [];
+        if (!isset($_SESSION['user_id'])) return [];
+
+        $user_id = $_SESSION['user_id'];
+        $sql = "SELECT books.* 
+                FROM carts 
+                JOIN books ON carts.book_id = books.id 
+                WHERE carts.user_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        return $result->fetch_all(MYSQLI_ASSOC);
     }
 
-    public static function confirmBorrow($book_id) {
-    global $conn;
-    session_start();
-
-    if (!isset($_SESSION['user_id'])) {
-        throw new Exception("User belum login");
+    public static function clearCart() {
+        global $conn;
+        $user_id = $_SESSION['user_id'];
+        $stmt = $conn->prepare("DELETE FROM carts WHERE user_id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
     }
-
-    $user_id = $_SESSION['user_id'];
-    $msg = "User ID $user_id meminjam buku ID $book_id";
-
-    // Simpan ke tabel peminjaman (misal loans)
-    $conn->query("INSERT INTO loans (book_id, user_id, status, borrow_date) VALUES ($book_id, $user_id, 'Menunggu Konfirmasi', NOW())");
-
-    // Simpan notifikasi ke admin
-    $conn->query("INSERT INTO notifications (user_id, message, created_at) VALUES ($user_id, '$msg', NOW())");
-    }
-
 }
 ?>

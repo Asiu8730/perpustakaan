@@ -1,45 +1,25 @@
-// assets/js/user/notification.js
-document.addEventListener("DOMContentLoaded", () => {
-  const addToCartLinks = document.querySelectorAll('a[href*="page=cart&action=add&id="]');
+function showNotification(message) {
+  const existing = document.querySelector(".notification-toast");
+  if (existing) existing.remove();
 
-  addToCartLinks.forEach(link => {
-    link.addEventListener("click", async (e) => {
-      e.preventDefault(); // jangan pindah halaman
-      const url = link.href;
+  const notif = document.createElement("div");
+  notif.className = "notification-toast";
+  notif.textContent = message;
 
-      try {
-        const res = await fetch(url, {
-          headers: { "X-Requested-With": "XMLHttpRequest" }
-        });
-        const data = await res.json();
-
-        showToast(data.message, data.status);
-      } catch (err) {
-        console.error("Gagal menambahkan ke keranjang:", err);
-        showToast("Terjadi kesalahan, coba lagi.", "error");
-      }
-    });
+  Object.assign(notif.style, {
+    position: "fixed",
+    bottom: "30px",
+    right: "30px",
+    background: "#4CAF50",
+    color: "#fff",
+    padding: "12px 20px",
+    borderRadius: "10px",
+    boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+    zIndex: "9999",
+    fontSize: "14px",
+    animation: "fadeInOut 3s ease",
   });
-});
 
-/**
- * Fungsi menampilkan toast notification di pojok kanan bawah
- */
-function showToast(message, status = "success") {
-  // buat elemen
-  const toast = document.createElement("div");
-  toast.className = `toast ${status}`;
-  toast.innerText = message;
-
-  // tambahkan ke body
-  document.body.appendChild(toast);
-
-  // animasi masuk
-  setTimeout(() => toast.classList.add("show"), 50);
-
-  // hilang otomatis
-  setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => toast.remove(), 500);
-  }, 3000);
+  document.body.appendChild(notif);
+  setTimeout(() => notif.remove(), 3000);
 }

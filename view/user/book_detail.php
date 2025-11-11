@@ -26,18 +26,17 @@ if (!$book) {
     exit();
 }
 
-// Jika tombol 'pinjam' diklik → tambahkan ke keranjang
+// Jika tombol 'pinjam' diklik → tambahkan ke keranjang (sementara sama seperti sebelumnya)
 if (isset($_POST['add_to_cart'])) {
     if (!isset($_SESSION['cart'])) {
         $_SESSION['cart'] = [];
     }
 
-    // Hindari duplikasi buku di keranjang
     if (!in_array($id, $_SESSION['cart'])) {
         $_SESSION['cart'][] = $id;
-        $message = "uku sudah ada di keranjang.";
-    } else {
         $message = "Buku berhasil ditambahkan ke keranjang.";
+    } else {
+        $message = "Buku sudah ada di keranjang.";
     }
 
     header("Location: dashboard_user.php?page=cart");
@@ -76,16 +75,18 @@ if (isset($_POST['add_to_cart'])) {
             <p><span>Deskripsi:</span><br><?= nl2br(htmlspecialchars($book['description'])); ?></p>
 
             <div class="action-buttons">
-                <form method="POST">
+                <form method="POST" id="borrowForm">
                     <button type="submit" name="add_to_cart" class="borrow-btn">Pinjam Buku</button>
-                    <a href="dashboard_user.php?page=cart&action=add&id=<?= $book['id']; ?>" class="borrow-btn">Tambah ke Keranjang</a>
+                    <button type="button" class="borrow-btn" id="addToCartBtn" data-id="<?= $book['id']; ?>">Tambah ke Keranjang</button>
                     <a href="dashboard_user.php" class="back-btn">Kembali</a>
                 </form>
             </div>
         </div>
     </div>
 
+    <!-- ✅ Script terpisah -->
     <script src="assets/js/user/notification.js"></script>
-
+    <script src="assets/js/user/cart.js"></script>
+    <script src="assets/js/user/confirm.js"></script>
 </body>
 </html>

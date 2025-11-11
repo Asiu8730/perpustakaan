@@ -2,25 +2,21 @@
 session_start();
 require_once __DIR__ . '/../controllers/CartController.php';
 
-// =====================
-// 🟩 Tambahan untuk AJAX notifikasi keranjang
-// =====================
+// ==== Tangani AJAX tambah ke keranjang ====
 if (isset($_GET['page']) && $_GET['page'] === 'cart' && isset($_GET['action']) && $_GET['action'] === 'add' && isset($_GET['id'])) {
     $book_id = intval($_GET['id']);
-    
-    // Jika request datang dari fetch() → kirim JSON, bukan redirect
+
+    // Jika AJAX request (fetch)
     if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
         header('Content-Type: application/json');
-
         $result = CartController::addToCart($book_id);
         echo json_encode($result);
         exit;
     }
 
-    // Jika bukan AJAX → jalankan alur biasa
+    // Jika non-AJAX (akses langsung di URL)
     CartController::addToCart($book_id);
 }
-
 // =====================
 // 🟦 Logika login dan routing utama
 // =====================
