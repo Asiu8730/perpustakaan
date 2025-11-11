@@ -1,0 +1,22 @@
+/* ✅ Notifikasi Tambah ke Keranjang (muncul dari kanan, warna biru) */
+.cart-notification {
+  position: fixed;
+  top: 30px;
+  right: -350px; /* awal di luar layar kanan */
+  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  color: #fff;
+  padding: 14px 20px;
+  border-radius: 10px 0 0 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  transition: right 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  opacity: 0;
+  z-index: 9999;
+}
+
+/* Saat ditampilkan */
+.cart-notification.show {
+  right: 20px;
+  opacity: 1;
+}

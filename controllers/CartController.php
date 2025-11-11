@@ -22,18 +22,14 @@ class CartController {
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
-            return ['status' => 'exists', 'message' => 'Buku sudah ada di keranjang'];
+            
         }
 
         // Tambahkan ke tabel carts
         $stmt = $conn->prepare("INSERT INTO carts (user_id, book_id, created_at) VALUES (?, ?, NOW())");
         $stmt->bind_param("ii", $user_id, $book_id);
 
-        if ($stmt->execute()) {
-            return ['status' => 'success', 'message' => 'Buku berhasil ditambahkan ke keranjang'];
-        } else {
-            return ['status' => 'error', 'message' => 'Gagal menambahkan buku ke keranjang'];
-        }
+        
     }
 
     public static function removeFromCart($book_id) {

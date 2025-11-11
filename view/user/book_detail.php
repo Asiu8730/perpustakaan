@@ -26,22 +26,7 @@ if (!$book) {
     exit();
 }
 
-// Jika tombol 'pinjam' diklik → tambahkan ke keranjang (sementara sama seperti sebelumnya)
-if (isset($_POST['add_to_cart'])) {
-    if (!isset($_SESSION['cart'])) {
-        $_SESSION['cart'] = [];
-    }
 
-    if (!in_array($id, $_SESSION['cart'])) {
-        $_SESSION['cart'][] = $id;
-        $message = "Buku berhasil ditambahkan ke keranjang.";
-    } else {
-        $message = "Buku sudah ada di keranjang.";
-    }
-
-    header("Location: dashboard_user.php?page=cart");
-    exit();
-}
 ?>
 
 <!DOCTYPE html>
