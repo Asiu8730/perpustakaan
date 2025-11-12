@@ -25,8 +25,6 @@ if (!$book) {
     echo "<p>Buku tidak ditemukan.</p>";
     exit();
 }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -38,7 +36,6 @@ if (!$book) {
     <link rel="stylesheet" href="assets/css/global.css">
 </head>
 <body>
-    <!-- Header -->
     <?php include __DIR__ . '/../templates/header.php'; ?>
 
     <div class="book-detail-container">
@@ -69,7 +66,7 @@ if (!$book) {
         </div>
     </div>
 
-    <!-- ✅ Script terpisah -->
+    <!-- JS -->
     <script src="assets/js/user/notification.js"></script>
     <script src="assets/js/user/cart.js"></script>
     <script src="assets/js/user/confirm.js"></script>
