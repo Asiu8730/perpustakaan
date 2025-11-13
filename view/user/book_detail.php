@@ -61,7 +61,6 @@ if (!$book) {
 
             <div class="action-buttons">
                 <form method="POST" id="borrowForm">
-                    <button type="submit" name="add_to_cart" class="borrow-btn">Pinjam Buku</button>
                     <button type="button" class="borrow-btn" id="addToCartBtn" data-id="<?= $book['id']; ?>">Tambah ke Keranjang</button>
                     <a href="dashboard_user.php" class="back-btn">Kembali</a>
                 </form>

@@ -105,14 +105,21 @@ document.addEventListener("DOMContentLoaded", () => {
           );
           const result = await response.json();
 
+          // 🟢 Menyesuaikan pesan berdasarkan hasil validasi dari CartController
           if (result.status === "exists") {
             showNotification("Buku sudah ada di keranjang", "#ff9800");
           } else if (result.status === "success") {
-            showNotification("Buku berhasil ditambahkan ke keranjang");
+            showNotification("Buku berhasil ditambahkan ke keranjang", "#4CAF50");
+          } else if (result.status === "error" && result.message.includes("proses")) {
+            showNotification("Buku ini sedang dalam proses peminjaman / menunggu konfirmasi admin", "#f44336");
+          } else if (result.status === "error") {
+            showNotification(result.message, "#f44336");
           } else {
             showNotification("Gagal menambahkan buku ke keranjang", "#f44336");
           }
+
         } catch (err) {
+          console.error(err);
           showNotification("Terjadi kesalahan, coba lagi", "#f44336");
         }
       });

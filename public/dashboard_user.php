@@ -40,22 +40,29 @@ switch ($page) {
     case 'book_detail':
         $file = $viewPath . 'book_detail.php';
         break;
-    case 'borrowed_books':
+
+    case 'borrowed': // ✅ tambahkan case ini
+    case 'borrowed_books': // optional, jaga-jaga kalau link pakai borrowed_books
         $file = $viewPath . 'borrowed_books.php';
         break;
+
     case 'history':
         $file = $viewPath . 'history.php';
         break;
+
     case 'setting':
         $file = $viewPath . 'setting.php';
         break;
+
     case 'cart':
         $file = $viewPath . 'cart.php';
         break;
+
     default:
         $file = $viewPath . 'dashboard.php';
         break;
 }
+
 
 if (file_exists($file)) {
     include $file;

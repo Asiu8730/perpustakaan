@@ -10,8 +10,6 @@
         <h2>Admin Panel</h2>
         <ul>
             <div class="notification-container">
-            
-            <li><a href="/reca/perpustakaan/public/dashboard_admin.php?page=home">Dashboard</a></li>
             <li><a href="/reca/perpustakaan/public/dashboard_admin.php?page=books">Kelola Buku</a></li>
             <li><a href="/reca/perpustakaan/public/dashboard_admin.php?page=users">Kelola User</a></li>
             <li><a href="/reca/perpustakaan/public/dashboard_admin.php?page=categories">Kelola Kategori</a></li>
@@ -23,7 +21,7 @@
     <!-- Konten Dinamis -->
     <div class="main-content">
         <?php
-        $page = $_GET['page'] ?? 'home';
+        $page = $_GET['page'] ?? 'books';
         switch ($page) {
             case 'books':
                 include __DIR__ . '/manage_books.php';
