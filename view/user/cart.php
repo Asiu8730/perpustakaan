@@ -31,32 +31,41 @@ $books = CartController::getCartItems();
 
 <?php include __DIR__ . '/../templates/header.php'; ?>
 <div class="cart-container">
-    <h1>Keranjang Buku Saya</h1>
+    <h2 class="cart-title">🛒 Keranjang Buku Kamu</h2>
 
     <?php if (empty($books)): ?>
-        <p>Keranjang kamu kosong 📚</p>
-    <?php else: ?>
-        <table class="cart-table">
-            <tr>
-                <th>Cover</th>
-                <th>Judul</th>
-                <th>Penulis</th>
-                <th>Aksi</th>
-            </tr>
-            <?php foreach ($books as $book): ?>
-                <tr>
-                    <td><img src="../uploads/covers/<?= htmlspecialchars($book['cover']); ?>" width="60"></td>
-                    <td><?= htmlspecialchars($book['title']); ?></td>
-                    <td><?= htmlspecialchars($book['author']); ?></td>
-                    <td>
-                        <a href="dashboard_user.php?page=cart&remove=<?= $book['id']; ?>" class="btn-delete">Hapus</a>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </table>
+        <p class="empty-cart">Keranjang masih kosong 📚</p>
 
-        <form method="POST">
-            <button type="submit" name="confirm" class="btn-confirm">Konfirmasi ke Admin</button>
+    <?php else: ?>
+        <div class="cart-list">
+            <?php foreach ($books as $book): ?>
+                <div class="cart-card">
+
+                    <div class="cart-info">
+                        <img src="../uploads/covers/<?= htmlspecialchars($book['cover']); ?>" class="cart-cover">
+
+                        <div class="cart-text">
+                            <h3><?= htmlspecialchars($book['title']); ?></h3>
+                            <p><strong>Penulis:</strong> <?= htmlspecialchars($book['author']); ?></p>
+                        </div>
+                    </div>
+
+                    <div class="cart-action">
+                        <a href="dashboard_user.php?page=cart&remove=<?= $book['id']; ?>" class="btn-delete">
+                            Hapus
+                        </a>
+                    </div>
+
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <!-- Tombol Konfirmasi kecil & di tengah -->
+        <form method="POST" class="confirm-wrapper">
+            <button type="submit" name="confirm" class="btn-confirm-small">
+                Konfirmasi ke Petugas
+            </button>
         </form>
+
     <?php endif; ?>
 </div>

@@ -9,21 +9,23 @@ if (!file_exists($upload_dir)) mkdir($upload_dir, 0777, true);
 // Tambah buku
 if (isset($_POST['add'])) {
     $cover_name = null;
+    $stock = intval($_POST['stock'] ?? 1);
     if (!empty($_FILES['cover']['name'])) {
         $cover_name = time() . '_' . basename($_FILES['cover']['name']);
         move_uploaded_file($_FILES['cover']['tmp_name'], $upload_dir . $cover_name);
     }
 
     BookController::addBook(
-    $_POST['title'],
-    $_POST['author'],
-    $_POST['publisher'],
-    $_POST['category'],
-    $_POST['publish_date'],
-    $_POST['description'] ?? '', // tambahkan deskripsi
-    $cover_name, // bisa null
-    $_POST['status']
-);
+        $_POST['title'],
+        $_POST['author'],
+        $_POST['publisher'],
+        $_POST['category'],
+        $_POST['publish_date'],
+        $_POST['description'] ?? '',
+        $cover_name,
+        $_POST['status'],
+        $stock
+    );
     header("Location: ../public/dashboard_admin.php?page=books");
     exit();
 }
@@ -31,6 +33,7 @@ if (isset($_POST['add'])) {
 // Update buku
 if (isset($_POST['update'])) {
     $cover_name = null;
+    $stock = intval($_POST['stock'] ?? 1);
     if (!empty($_FILES['cover']['name'])) {
         $cover_name = time() . '_' . basename($_FILES['cover']['name']);
         move_uploaded_file($_FILES['cover']['tmp_name'], $upload_dir . $cover_name);
@@ -45,7 +48,8 @@ if (isset($_POST['update'])) {
         $_POST['publish_date'],
         $_POST['description'],
         $cover_name,
-        $_POST['status']
+        $_POST['status'],
+        $stock
     );
     header("Location: ../public/dashboard_admin.php?page=books");
     exit();
@@ -81,6 +85,7 @@ $categories = CategoriesController::getAllCategories();
         <th>Kategori</th>
         <th>Tanggal Terbit</th>
         <th>Deskripsi</th>
+        <th>Stock</th>
         <th>Status</th>
         <th>Aksi</th>
     </tr>
@@ -101,6 +106,7 @@ $categories = CategoriesController::getAllCategories();
                 <td><?= htmlspecialchars($row['category_name'] ?? '-'); ?></td>
                 <td><?= htmlspecialchars($row['publish_date']); ?></td>
                 <td style="max-width:200px;"><?= nl2br(htmlspecialchars($row['description'] ?? '-')); ?></td>
+                <td><?= htmlspecialchars($row['stock'] ?? 0); ?></td>
                 <td><?= htmlspecialchars($row['status']); ?></td>
                 <td>
                     <button type="button" class="action-btn update-btn"
@@ -112,8 +118,10 @@ $categories = CategoriesController::getAllCategories();
                             '<?= $row['category_id'] ?>',
                             '<?= $row['publish_date'] ?>',
                             '<?= htmlspecialchars($row['description'], ENT_QUOTES) ?>',
+                            '<?= $row['stock'] ?>',
                             '<?= $row['status'] ?>'
-                        )">Edit</button>
+                        )"
+                        >Edit</button>
                     <a href="../public/dashboard_admin.php?page=books&delete=<?= $row['id']; ?>"
                        class="action-btn delete-btn"
                        onclick="return confirm('Hapus buku ini?')">Hapus</a>
@@ -145,10 +153,13 @@ $categories = CategoriesController::getAllCategories();
         <input type="date" name="publish_date" required>
 
         <label for="description">Deskripsi Buku</label>
-        <textarea name="description" rows="3" placeholder="Tulis deskripsi buku..." required></textarea>
+        <textarea name="description" rows="3" ...></textarea>
 
         <label for="cover">Cover Buku</label>
-        <input type="file" name="cover" accept="image/*" required>
+        <input type="file" name="cover" accept="image/*">
+
+        <label for="stock">Stok (buku tersedia)</label>
+        <input type="number" name="stock" min="0" value="1" required>
 
         <label for="status">Status</label>
         <select name="status" required>
@@ -169,6 +180,7 @@ $categories = CategoriesController::getAllCategories();
 
     <form method="POST" enctype="multipart/form-data" class="books-form">
         <input type="hidden" name="id" id="edit_id">
+
         <input type="text" name="title" id="edit_title" required>
         <input type="text" name="author" id="edit_author" required>
         <input type="text" name="publisher" id="edit_publisher" required>
@@ -182,13 +194,16 @@ $categories = CategoriesController::getAllCategories();
 
         <input type="date" name="publish_date" id="edit_publish_date" required>
 
-        <label for="description">Deskripsi Buku</label>
+        <label>Deskripsi Buku</label>
         <textarea name="description" id="edit_description" rows="3" required></textarea>
-
-        <label for="cover">Ganti Cover (opsional)</label>
+        
+        <label>Ganti Cover (opsional)</label>
         <input type="file" name="cover" accept="image/*">
 
-        <label for="status">Status</label>
+        <label>Stok Buku (Jumlah tersedia)</label>
+        <input type="number" name="stock" id="edit_stock" min="0" required>
+
+        <label>Status</label>
         <select name="status" id="edit_status" required>
             <option value="Tersedia">Tersedia</option>
             <option value="Tidak Tersedia">Tidak Tersedia</option>
@@ -200,19 +215,33 @@ $categories = CategoriesController::getAllCategories();
 </div>
 
 <script>
-function openAddModal() { document.getElementById("addModal").style.display = "block"; }
-function closeAddModal() { document.getElementById("addModal").style.display = "none"; }
+function openAddModal() { 
+    document.getElementById("addModal").style.display = "block"; 
+}
+function closeAddModal() { 
+    document.getElementById("addModal").style.display = "none"; 
+}
 
-function openEditModal(id, title, author, publisher, category, publish_date, description, status) {
+function openEditModal(id, title, author, publisher, category, publish_date, description, status, stock) {
+
     document.getElementById("edit_id").value = id;
     document.getElementById("edit_title").value = title;
     document.getElementById("edit_author").value = author;
     document.getElementById("edit_publisher").value = publisher;
+
     document.getElementById("edit_category").value = category;
     document.getElementById("edit_publish_date").value = publish_date;
+
     document.getElementById("edit_description").value = description;
+
+    document.getElementById("edit_stock").value = stock;  // 🔥 FIX PENTING
+
     document.getElementById("edit_status").value = status;
+
     document.getElementById("editModal").style.display = "block";
 }
-function closeEditModal() { document.getElementById("editModal").style.display = "none"; }
+
+function closeEditModal() { 
+    document.getElementById("editModal").style.display = "none"; 
+}
 </script>

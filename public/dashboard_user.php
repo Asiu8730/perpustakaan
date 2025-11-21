@@ -1,7 +1,13 @@
 <?php
 session_start();
 require_once __DIR__ . '/../controllers/CartController.php';
+require_once __DIR__ . '/../controllers/BorrowController.php';
+require_once __DIR__ . '/../controllers/NotificationController.php';
 
+// 🔔 Jalankan pengecekan tenggat otomatis
+if (isset($_SESSION['user_id'])) {
+    BorrowController::notifyDeadline($_SESSION['user_id']);
+}
 // ======================================
 // 🟢 Handler AJAX "Tambah ke Keranjang"
 // ======================================
@@ -61,8 +67,16 @@ switch ($page) {
     default:
         $file = $viewPath . 'dashboard.php';
         break;
-}
 
+    case 'notification':
+        $file = $viewPath . 'notification.php';
+        break;
+
+    case 'category_detail':
+        $file = $viewPath . 'category_detail.php';
+        break;
+
+    }
 
 if (file_exists($file)) {
     include $file;

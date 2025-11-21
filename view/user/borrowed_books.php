@@ -26,63 +26,59 @@ $result = $query->get_result();
 <?php include __DIR__ . '/../templates/header.php'; ?>
 
 <div class="borrowed-container">
-    <h2>Daftar Buku yang Dipinjam</h2>
+    <h2 class="borrowed-title">📚 Daftar Buku yang Dipinjam</h2>
 
-    <table class="borrowed-table">
-        <tr>
-            <th>No</th>
-            <th>Judul Buku</th>
-            <th>Tanggal Pinjam</th>
-            <th>Tenggat Pengembalian</th>
-            <th>Status</th>
-            <th>Aksi</th>
-        </tr>
-
+    <div class="borrowed-list">
         <?php
         $no = 1;
         while ($row = $result->fetch_assoc()):
         ?>
-        <tr>
-            <td><?= $no++; ?></td>
-            <td><?= htmlspecialchars($row['title']); ?></td>
-            <td><?= htmlspecialchars($row['borrow_date']); ?></td>
-            <td>
-                <?php if (!empty($row['return_date'])): ?>
-                    <?= htmlspecialchars($row['return_date']); ?>
-                <?php else: ?>
-                    <em>-</em>
-                <?php endif; ?>
-            </td>
-            <td>
-                <span class="status <?= strtolower($row['status']); ?>">
+        <div class="borrow-card">
+
+            <div class="borrow-info">
+                <h3><?= htmlspecialchars($row['title']); ?></h3>
+
+                <p><strong>Tanggal Pinjam:</strong> <?= htmlspecialchars($row['borrow_date']); ?></p>
+
+                <p><strong>Tenggat:</strong> 
+                    <?php if (!empty($row['return_date'])): ?>
+                        <?= htmlspecialchars($row['return_date']); ?>
+                    <?php else: ?>
+                        <em>-</em>
+                    <?php endif; ?>
+                </p>
+
+                <span class="status-pill <?= strtolower($row['status']); ?>">
                     <?= ucwords(str_replace('_', ' ', $row['status'])); ?>
                 </span>
-            </td>
-            <td>
+            </div>
+
+            <div class="borrow-action">
                 <?php if ($row['status'] === 'dipinjam'): ?>
-                    <form method="POST" style="display:inline;">
+                    <form method="POST">
                         <input type="hidden" name="loan_id" value="<?= $row['id']; ?>">
-                        <button type="submit" name="return_request" class="btn-warning">
+                        <button type="submit" name="return_request" class="btn-return">
                             Ajukan Pengembalian
                         </button>
                     </form>
 
                 <?php elseif ($row['status'] === 'menunggu_konfirmasi_admin'): ?>
-                    <span class="status pending">Menunggu Konfirmasi Admin</span>
+                    <span class="status waiting">Menunggu Konfirmasi Admin</span>
 
                 <?php elseif ($row['status'] === 'menunggu_konfirmasi_pengembalian'): ?>
-                    <span class="status pending">Menunggu Konfirmasi Pengembalian</span>
+                    <span class="status waiting">Menunggu Konfirmasi Pengembalian</span>
 
                 <?php elseif ($row['status'] === 'dikembalikan'): ?>
-                    <span class="status selesai">Dikembalikan</span>
+                    <span class="status done">Dikembalikan</span>
 
                 <?php else: ?>
                     <span class="status">-</span>
                 <?php endif; ?>
-            </td>
-        </tr>
+            </div>
+
+        </div>
         <?php endwhile; ?>
-    </table>
+    </div>
 </div>
 
 <?php

@@ -32,6 +32,13 @@
     border-radius: 20px;
 }
 
+.navbar-center {
+    position: relative; /* penting supaya dropdown posisinya relatif */
+    display: flex;
+    align-items: center;
+}
+
+
 .navbar-center input {
     border: none;
     outline: none;
@@ -135,4 +142,63 @@
 
 .home-link:hover {
     color: #00ccff;
+}
+
+.notif-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.notif-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: red;
+    color: white;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 50%;
+    font-weight: bold;
+    border: 1px solid white;
+}
+
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+.search-item {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+}
+
+.search-text-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.search-thumb {
+    width: 48px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.search-results {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    width: 360px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 6px 20px rgba(0,0,0,0.08);
+    max-height: 320px;
+    overflow-y: auto;
+    display: none;
+    z-index: 2000;
+    padding: 6px 0;
 }
