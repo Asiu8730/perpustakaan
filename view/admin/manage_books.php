@@ -234,8 +234,6 @@ function openEditModal(id, title, author, publisher, category, publish_date, des
 
     document.getElementById("edit_description").value = description;
 
-    document.getElementById("edit_stock").value = stock;  // 🔥 FIX PENTING
-
     document.getElementById("edit_status").value = status;
 
     document.getElementById("editModal").style.display = "block";
