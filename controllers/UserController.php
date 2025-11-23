@@ -26,6 +26,41 @@ class UserController {
         return $stmt->execute();
     }
 
+public static function getUserById($id) {
+    global $conn;
+    $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc();
+}
+
+    public static function updateUserProfile($id, $username, $email, $password = null, $photo = null) {
+        global $conn;
+
+        $fields = "username=?, email=?";
+        $types = "ssi";
+        $params = [$username, $email, $id];
+
+        if ($password !== null) {
+            $fields .= ", password=?";
+            $types = "sssi";
+            $params = [$username, $email, password_hash($password, PASSWORD_BCRYPT), $id];
+        }
+
+        if ($photo !== null) {
+            $fields .= ", photo=?";
+            $types = "sssi";
+            $params = [$username, $email, $photo, $id];
+        }
+
+        $sql = "UPDATE users SET $fields WHERE id=?";
+        $stmt = $conn->prepare($sql);
+
+        $stmt->bind_param($types, ...$params);
+
+        return $stmt->execute();
+    }
     public static function getPaginatedUsers($limit, $offset, $keyword = '', $sort = '') {
         global $conn;
 
