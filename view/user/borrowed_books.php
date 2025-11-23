@@ -2,25 +2,24 @@
 require_once __DIR__ . '/../../controllers/BorrowController.php';
 require_once __DIR__ . '/../../config/database.php';
 
-global $conn;
 if (session_status() === PHP_SESSION_NONE) session_start();
-
 $user_id = $_SESSION['user_id'];
 
-// Ambil semua peminjaman user
-$query = $conn->prepare("
-    SELECT borrows.*, books.title 
-    FROM borrows
-    LEFT JOIN books ON borrows.book_id = books.id
-    WHERE borrows.user_id = ?
-    ORDER BY borrows.id DESC
-");
-$query->bind_param("i", $user_id);
-$query->execute();
-$result = $query->get_result();
+// Pagination
+$page = isset($_GET['p']) ? intval($_GET['p']) : 1;
+if ($page < 1) $page = 1;
+
+$limit = 5; 
+$offset = ($page - 1) * $limit;
+
+// Ambil data pinjaman
+$borrowed = BorrowController::getPaginatedUserBorrows($user_id, $limit, $offset);
+$total_borrowed = BorrowController::countUserBorrows($user_id);
+$total_pages = ceil($total_borrowed / $limit);
 ?>
 
 <link rel="stylesheet" href="assets/css/user/borrowed_books.css">
+<link rel="stylesheet" href="assets/css/user/borrowed_pagination.css">
 <link rel="stylesheet" href="assets/css/global.css">
 
 <?php include __DIR__ . '/../templates/header.php'; ?>
@@ -29,10 +28,7 @@ $result = $query->get_result();
     <h2 class="borrowed-title">📚 Daftar Buku yang Dipinjam</h2>
 
     <div class="borrowed-list">
-        <?php
-        $no = 1;
-        while ($row = $result->fetch_assoc()):
-        ?>
+        <?php foreach ($borrowed as $row): ?>
         <div class="borrow-card">
 
             <div class="borrow-info">
@@ -40,12 +36,8 @@ $result = $query->get_result();
 
                 <p><strong>Tanggal Pinjam:</strong> <?= htmlspecialchars($row['borrow_date']); ?></p>
 
-                <p><strong>Tenggat:</strong> 
-                    <?php if (!empty($row['return_date'])): ?>
-                        <?= htmlspecialchars($row['return_date']); ?>
-                    <?php else: ?>
-                        <em>-</em>
-                    <?php endif; ?>
+                <p><strong>Tenggat:</strong>
+                    <?= $row['return_date'] ? htmlspecialchars($row['return_date']) : '<em>-</em>' ?>
                 </p>
 
                 <span class="status-pill <?= strtolower($row['status']); ?>">
@@ -71,24 +63,40 @@ $result = $query->get_result();
                 <?php elseif ($row['status'] === 'dikembalikan'): ?>
                     <span class="status done">Dikembalikan</span>
 
-                <?php else: ?>
-                    <span class="status">-</span>
                 <?php endif; ?>
             </div>
 
         </div>
-        <?php endwhile; ?>
+        <?php endforeach; ?>
     </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        <?php if ($page > 1): ?>
+            <a href="dashboard_user.php?page=borrowed_books&p=<?= $page-1 ?>">&laquo; Prev</a>
+        <?php endif; ?>
+
+        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+            <a href="dashboard_user.php?page=borrowed_books&p=<?= $i ?>" 
+               class="<?= ($i == $page) ? 'active' : '' ?>">
+               <?= $i ?>
+            </a>
+        <?php endfor; ?>
+
+        <?php if ($page < $total_pages): ?>
+            <a href="dashboard_user.php?page=borrowed_books&p=<?= $page+1 ?>">Next &raquo;</a>
+        <?php endif; ?>
+    </div>
+
 </div>
 
 <?php
-// Ketika user klik tombol konfirmasi pengembalian
+// Ajukan pengembalian
 if (isset($_POST['return_request'])) {
-    $loan_id = $_POST['loan_id'];
-    BorrowController::requestReturn($loan_id);
+    BorrowController::requestReturn($_POST['loan_id']);
 
     echo "<script>
-        alert('Permintaan pengembalian berhasil dikirim ke admin.');
+        alert('Permintaan pengembalian berhasil dikirim.');
         window.location.href = 'dashboard_user.php?page=borrowed_books';
     </script>";
 }

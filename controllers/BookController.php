@@ -18,8 +18,7 @@ class BookController {
         }
 
         $res = $conn->query($sql);
-        if (!$res) return [];
-        return $res->fetch_all(MYSQLI_ASSOC);
+        return $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
     }
 
     public static function getCategories() {
@@ -29,33 +28,84 @@ class BookController {
         return $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
     }
 
+
+    /* ==========================================================
+       TAMBAH BUKU
+    ========================================================== */
     public static function addBook($title, $author, $publisher, $category_id, $publish_date, $description, $cover = null, $status = 'Tersedia', $stock = 1) {
         global $conn;
         if (empty($cover)) $cover = 'no_cover.png';
 
-        $stmt = $conn->prepare("INSERT INTO books (title, author, publisher, category_id, publish_date, description, cover, status, stock)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        if (!$stmt) throw new Exception("Prepare addBook failed: " . $conn->error);
-        $stmt->bind_param("sssissssi", $title, $author, $publisher, $category_id, $publish_date, $description, $cover, $status, $stock);
+        $stmt = $conn->prepare("
+            INSERT INTO books (title, author, publisher, category_id, publish_date, description, cover, status, stock)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+
+        $stmt->bind_param("sssissssi",
+            $title,
+            $author,
+            $publisher,
+            $category_id,
+            $publish_date,
+            $description,
+            $cover,
+            $status,
+            $stock
+        );
+
         $ok = $stmt->execute();
-        if (!$ok) throw new Exception("Execute addBook failed: " . $stmt->error);
         $stmt->close();
         return $ok;
     }
 
+
+    /* ==========================================================
+       UPDATE BUKU
+    ========================================================== */
     public static function updateBook($id, $title, $author, $publisher, $category_id, $publish_date, $description, $cover = null, $status = 'Tersedia', $stock = 1) {
         global $conn;
 
+        // Jika upload cover baru
         if ($cover) {
-            $stmt = $conn->prepare("UPDATE books 
-                SET title=?, author=?, publisher=?, category_id=?, publish_date=?, description=?, cover=?, status=?, stock=? 
-                WHERE id=?");
-            $stmt->bind_param("sssissssii", $title, $author, $publisher, $category_id, $publish_date, $description, $cover, $status, $stock, $id);
+            $stmt = $conn->prepare("
+                UPDATE books
+                SET title=?, author=?, publisher=?, category_id=?, publish_date=?, description=?, cover=?, status=?, stock=?
+                WHERE id=?
+            ");
+
+            $stmt->bind_param("sssissssii",
+                $title,
+                $author,
+                $publisher,
+                $category_id,
+                $publish_date,
+                $description,
+                $cover,
+                $status,
+                $stock,
+                $id
+            );
+
+        // Jika TIDAK upload cover baru
         } else {
-            $stmt = $conn->prepare("UPDATE books 
-                SET title=?, author=?, publisher=?, category_id=?, publish_date=?, description=?, status=?, stock=? 
-                WHERE id=?");
-            $stmt->bind_param("sssisssii", $title, $author, $publisher, $category_id, $publish_date, $description, $status, $stock, $id);
+            $stmt = $conn->prepare("
+                UPDATE books
+                SET title=?, author=?, publisher=?, category_id=?, publish_date=?, description=?, status=?, stock=?
+                WHERE id=?
+            ");
+
+            // ⚠️ PARAMETER BENAR (8 STRING/INT + ID)
+            $stmt->bind_param("sssisssii",
+                $title,
+                $author,
+                $publisher,
+                $category_id,
+                $publish_date,
+                $description,
+                $status,
+                $stock,
+                $id
+            );
         }
 
         $ok = $stmt->execute();
@@ -63,6 +113,10 @@ class BookController {
         return $ok;
     }
 
+
+    /* ==========================================================
+       DELETE
+    ========================================================== */
     public static function deleteBook($id) {
         global $conn;
         $stmt = $conn->prepare("DELETE FROM books WHERE id=?");
@@ -72,29 +126,42 @@ class BookController {
         return $ok;
     }
 
+
+    /* ==========================================================
+       SEARCH
+    ========================================================== */
     public static function searchBooks($keyword) {
         global $conn;
-        $like = "%" . $conn->real_escape_string($keyword) . "%";
-        $stmt = $conn->prepare("SELECT books.*, categories.name AS category_name
-                                FROM books
-                                LEFT JOIN categories ON books.category_id = categories.id
-                                WHERE books.title LIKE ? OR books.author LIKE ? OR books.publisher LIKE ? OR categories.name LIKE ?
-                                ORDER BY books.id DESC");
+        $like = "%".$keyword."%";
+        $stmt = $conn->prepare("
+            SELECT books.*, categories.name AS category_name
+            FROM books
+            LEFT JOIN categories ON books.category_id = categories.id
+            WHERE books.title LIKE ? OR books.author LIKE ? OR books.publisher LIKE ? OR categories.name LIKE ?
+            ORDER BY books.id DESC
+        ");
         $stmt->bind_param("ssss", $like, $like, $like, $like);
         $stmt->execute();
         $res = $stmt->get_result();
         return $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
     }
 
+
+    /* ==========================================================
+       CATEGORY FILTER
+    ========================================================== */
     public static function getBooksByCategory($category_id) {
         global $conn;
         $stmt = $conn->prepare("SELECT * FROM books WHERE category_id = ? ORDER BY id DESC");
         $stmt->bind_param("i", $category_id);
         $stmt->execute();
-        $res = $stmt->get_result();
-        return $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
+
+    /* ==========================================================
+       STOCK
+    ========================================================== */
     public static function setStatus($id, $status) {
         global $conn;
         $stmt = $conn->prepare("UPDATE books SET status=? WHERE id=?");
@@ -102,19 +169,66 @@ class BookController {
         return $stmt->execute();
     }
 
-    // Kurangi stock (dipanggil saat admin set status jadi dipinjam)
     public static function decrementStock($id, $amount = 1) {
         global $conn;
-        $stmt = $conn->prepare("UPDATE books SET stock = GREATEST(stock - ?, 0), status = CASE WHEN stock - ? <= 0 THEN 'Tidak Tersedia' ELSE status END WHERE id = ?");
+        $stmt = $conn->prepare("
+            UPDATE books 
+            SET stock = GREATEST(stock - ?, 0),
+                status = CASE WHEN stock - ? <= 0 THEN 'Tidak Tersedia' ELSE status END
+            WHERE id = ?
+        ");
         $stmt->bind_param("iii", $amount, $amount, $id);
         return $stmt->execute();
     }
 
-    // Tambah stock (saat dikembalikan)
     public static function incrementStock($id, $amount = 1) {
         global $conn;
-        $stmt = $conn->prepare("UPDATE books SET stock = stock + ?, status = 'Tersedia' WHERE id = ?");
+        $stmt = $conn->prepare("
+            UPDATE books 
+            SET stock = stock + ?, status='Tersedia'
+            WHERE id=?
+        ");
         $stmt->bind_param("ii", $amount, $id);
         return $stmt->execute();
     }
+
+    public static function getBooksPaginated($limit, $offset, $sort = '', $search = '') {
+        global $conn;
+
+        $sql = "SELECT books.*, categories.name AS category_name 
+                FROM books
+                LEFT JOIN categories ON books.category_id = categories.id
+                WHERE 1=1 ";
+
+        // SEARCH
+        if ($search != '') {
+            $like = "%".$search."%";
+            $sql .= " AND (books.title LIKE '$like' 
+                    OR books.author LIKE '$like'
+                    OR books.publisher LIKE '$like')";
+        }
+
+        // SORT
+        switch ($sort) {
+            case 'title_asc':  $sql .= " ORDER BY books.title ASC"; break;
+            case 'title_desc': $sql .= " ORDER BY books.title DESC"; break;
+            case 'newest':     $sql .= " ORDER BY books.id DESC"; break;
+            case 'oldest':     $sql .= " ORDER BY books.id ASC"; break;
+            default:           $sql .= " ORDER BY books.id DESC"; break;
+        }
+
+        $sql .= " LIMIT $limit OFFSET $offset";
+
+        $res = $conn->query($sql);
+        return $res->fetch_all(MYSQLI_ASSOC);
+    }
+
+
+public static function countBooks() {
+    global $conn;
+    $res = $conn->query("SELECT COUNT(*) AS total FROM books");
+    $data = $res->fetch_assoc();
+    return $data['total'] ?? 0;
+}
+
 }

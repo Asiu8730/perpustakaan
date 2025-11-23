@@ -1,4 +1,7 @@
 /* ===== Styling tabel kelola buku ===== */
+
+
+
 .books-table {
     width: 100%;
     border-collapse: collapse; /* satukan border */
@@ -137,4 +140,206 @@
     background: #6c757d;
     text-decoration: none;
     line-height: 32px;
+}
+
+/* ==== MODAL LAYOUT ==== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(2px);
+}
+
+/* ==== WRAPPER KONTEN MODAL ==== */
+.modal-content {
+    background: #fff;
+    margin: 3% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 700px;
+
+    /* *** SCROLL DI DALAM MODAL *** */
+    max-height: 80vh;   
+    overflow-y: auto;   
+    overflow-x: hidden;
+
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+
+/* ==== SCROLL BAR YANG RAPI ===== */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.modal-content {
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 22px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination a {
+    display: inline-block;
+    padding: 8px 14px;
+    margin: 0 4px;
+    background: #3498db;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+.pagination a:hover {
+    background: #2980b9;
+}
+
+.pagination a.active {
+    background: #2ecc71;
+    pointer-events: none;
+}
+
+
+/* ============================
+   SEARCH FORM LAYOUT
+============================ */
+.search-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+/* ============================
+   INPUT & SELECT
+============================ */
+.search-form input[type="text"],
+.search-form select {
+    height: 38px;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* agar ukuran tetap stabil setelah pencarian */
+.search-form input[type="text"] {
+    width: 220px;
+}
+
+.search-form select {
+    width: 120px;
+}
+
+/* ============================
+   BUTTON CARI
+============================ */
+.search-form button {
+    height: 38px;
+    padding: 0 15px;
+    border: none;
+    background: #0d6efd;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* ============================
+   RESET BUTTON (fix ukuran)
+============================ */
+.reset-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 38px;            /* ⬅️ samakan tinggi */
+    padding: 0 15px;         /* ⬅️ samakan padding */
+    font-size: 14px;         /* ⬅️ samakan ukuran font */
+
+    background: #dc3545;
+    color: white;
+    border-radius: 6px;
+
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    white-space: nowrap;
+}
+
+/* Hover effect */
+.search-form button:hover,
+.reset-btn:hover {
+    opacity: 0.85;
+}
+
+/* ============================
+   FIX RESET BUTTON SIZE
+============================ */
+.reset-btn {
+    display: inline-block;
+    padding: 8px 14px;             /* Samain padding dengan tombol Cari */
+    background: #d9534f;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;               /* Samain ukuran teks */
+    height: 38px;                  /* Cocok dengan input & button lain */
+    line-height: 22px;             /* Supaya teks center */
+    box-sizing: border-box;
+    transition: 0.2s;
+}
+
+.reset-btn:hover {
+    background: #c9302c;
+}
+
+
+/* Pagination */
+.pagination {
+    margin-top: 15px;
+    display: flex;
+    gap: 8px;
+}
+
+.pagination a {
+    padding: 7px 14px;
+    background: #ecf0f1;
+    color: #2c3e50;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+.pagination a.active {
+    background: #3498db;
+    color: white;
+    font-weight: bold;
+}
+
+.pagination a:hover {
+    background: #bdc3c7;
 }

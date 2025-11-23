@@ -1,0 +1,105 @@
+/* === NAVBAR UTAMA === */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    padding: 10px 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    font-family: "Poppins", sans-serif;
+}
+
+/* === BAGIAN KIRI === */
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+}
+
+.home-link {
+    text-decoration: none;
+    color: #000;
+    font-weight: 600;
+}
+
+/* === SEARCH BAR === */
+.navbar-center {
+    position: relative;
+}
+
+.navbar-center form {
+    background: #f3f3f3;
+    padding: 6px 14px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-center input {
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 250px;
+    font-size: 14px;
+}
+
+/* === RESULT DROPDOWN === */
+.search-results {
+    display: none;
+    position: absolute;
+    top: 48px;
+    left: 0;
+    width: 360px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    max-height: 320px;
+    overflow-y: auto;
+    z-index: 2000;
+    padding: 8px 0;
+}
+
+/* === BAGIAN KANAN === */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* === BUTTON LOGIN & REGISTER === */
+.btn-login,
+.btn-register {
+    padding: 8px 18px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.2s;
+    font-weight: 500;
+}
+
+.btn-login {
+    background: transparent;
+    border: 1.5px solid #00b7ff;
+    color: #00b7ff;
+}
+.btn-login:hover {
+    background: #00b7ff;
+    color: white;
+}
+
+.btn-register {
+    background: #00b7ff;
+    color: white;
+}
+.btn-register:hover {
+    background: #0099d6;
+}

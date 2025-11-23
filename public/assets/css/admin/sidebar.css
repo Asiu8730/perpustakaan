@@ -47,22 +47,19 @@ body {
 .sidebar ul li {
     padding: 15px 20px;
     transition: background 0.3s;
+    cursor: pointer;   /* biar muncul tangan */
+    user-select: none; /* tidak bisa blok tulisan */
 }
+
 
 .sidebar ul li:hover {
     background: #34495e;
 }
 
-.sidebar ul li a {
-    color: #ecf0f1;
-    text-decoration: none;
-    display: block;
-}
-
 /* Content area */
 .main-content {
     margin-left: 220px; /* sesuai lebar sidebar */
-    padding: 20px;
+    padding: 5px 10px 0;
     flex: 1;
 }
 

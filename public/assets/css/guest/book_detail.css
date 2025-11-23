@@ -1,0 +1,152 @@
+
+/* ===== Container utama ===== */
+.book-detail-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+    display: flex;
+    gap: 40px;
+    padding: 30px;
+}
+
+/* ===== Gambar buku ===== */
+.book-cover {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.book-cover img {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* ===== Detail buku ===== */
+.book-info {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.book-info h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 10px;
+}
+
+.book-info p {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+/* ===== Label status ===== */
+.book-status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-top: 8px;
+}
+
+.status-tersedia {
+    background-color: #c8f7c5;
+    color: #2e7d32;
+}
+
+.status-dipinjam {
+    background-color: #ffe0b2;
+    color: #e65100;
+}
+
+.status-tidak-tersedia {
+    background-color: #ffcdd2;
+    color: #b71c1c;
+}
+
+/* ===== Tombol pinjam ===== */
+.borrow-btn {
+    display: inline-block;
+    background-color: #0069d9;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s ease;
+    text-align: center;
+    width: fit-content;
+}
+
+.borrow-btn:hover {
+    background-color: #004a9f;
+}
+
+/* ===== Deskripsi ===== */
+.book-description {
+    margin-top: 20px;
+    font-size: 1rem;
+    color: #444;
+    line-height: 1.7;
+}
+
+/* ===== Tombol kembali ===== */
+.back-link {
+    display: inline-block;
+    margin-top: 20px;
+    font-size: 0.95rem;
+    color: #0069d9;
+    text-decoration: none;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/* ===== Responsif ===== */
+@media (max-width: 768px) {
+    .book-detail-container {
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .book-cover img {
+        max-width: 250px;
+    }
+
+    /* notification */
+    .toast {
+        position: fixed;
+        bottom: 80px; /* agak tinggi dari pojok bawah */
+        right: 25px;
+        background: #4caf50;
+        color: white;
+        padding: 14px 20px;
+        border-radius: 8px;
+        font-size: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.3s ease;
+        z-index: 9999;
+    }
+    .toast.error {
+        background: #e74c3c;
+    }
+    .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}

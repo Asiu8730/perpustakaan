@@ -2,15 +2,11 @@
 require_once __DIR__ . '/../config/database.php';
 
 class UserController {
-    public static function getAllUsers() {
-        global $conn;
-        $sql = "SELECT * FROM users";
-        return $conn->query($sql);
-    }
 
     public static function addUser($username, $email, $password, $role) {
         global $conn;
         $hashed = password_hash($password, PASSWORD_DEFAULT);
+
         $stmt = $conn->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("ssss", $username, $email, $hashed, $role);
         return $stmt->execute();
@@ -30,27 +26,39 @@ class UserController {
         return $stmt->execute();
     }
 
-    public static function getUserById($id) {
-    global $conn;
-    $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    return $result->fetch_assoc();
-}
-
-    public static function updateUserProfile($id, $username, $email, $password = null, $photo = null) {
+    public static function getPaginatedUsers($limit, $offset, $keyword = '', $sort = '') {
         global $conn;
 
-        if ($password) {
-            $stmt = $conn->prepare("UPDATE users SET username=?, email=?, password=?, photo=? WHERE id=?");
-            $stmt->bind_param("ssssi", $username, $email, $password, $photo, $id);
-        } else {
-            $stmt = $conn->prepare("UPDATE users SET username=?, email=?, photo=? WHERE id=?");
-            $stmt->bind_param("sssi", $username, $email, $photo, $id);
+        $keyword = "%$keyword%";
+
+        $sql = "SELECT * FROM users WHERE username LIKE ? OR email LIKE ? ";
+
+        switch ($sort) {
+            case 'az': $sql .= "ORDER BY username ASC "; break;
+            case 'za': $sql .= "ORDER BY username DESC "; break;
+            case 'newest': $sql .= "ORDER BY id DESC "; break;
+            case 'oldest': $sql .= "ORDER BY id ASC "; break;
+            default: $sql .= "ORDER BY id DESC "; break;
         }
 
-        return $stmt->execute();
+        $sql .= "LIMIT ? OFFSET ?";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ssii", $keyword, $keyword, $limit, $offset);
+        $stmt->execute();
+
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
+    public static function countUsers($keyword = '') {
+        global $conn;
+
+        $keyword = "%$keyword%";
+
+        $stmt = $conn->prepare("SELECT COUNT(*) AS total FROM users WHERE username LIKE ? OR email LIKE ?");
+        $stmt->bind_param("ss", $keyword, $keyword);
+        $stmt->execute();
+
+        return $stmt->get_result()->fetch_assoc()['total'];
+    }
 }

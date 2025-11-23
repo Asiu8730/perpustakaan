@@ -6,6 +6,7 @@
 
 </head>
 <body>
+    <a href="dashboard_guest.php" class="back-btn">← Kembali</a>
     <div class="form-container">
     <h2>Register</h2>
     <form method="POST">

@@ -63,18 +63,54 @@ if (isset($_GET['delete'])) {
 }
 
 // Ambil data buku & kategori
-$sort = $_GET['sort'] ?? '';
-$books = BookController::getAllBooks($sort);
+
+$search = $_GET['search'] ?? '';
+$sort   = $_GET['sort']   ?? '';
 $categories = CategoriesController::getAllCategories();
+
+// Pagination
+$limit = 5;
+$page_now = isset($_GET['p']) ? intval($_GET['p']) : 1;
+if ($page_now < 1) $page_now = 1;
+
+$offset = ($page_now - 1) * $limit;
+
+$total_books = BookController::countBooks();
+$total_pages = ceil($total_books / $limit);
+
+// 🟢 Tambahkan ini!
+$sort = $_GET['sort'] ?? '';  // DEFAULT VALUE untuk mencegah warning
+$books = BookController::getBooksPaginated($limit, $offset, $sort, $search);
 ?>
 
 <base href="/reca/perpustakaan/public/">
 <link rel="stylesheet" href="assets/css/admin/books.css">
 
-<div class="books-container">
+<class="books-container">
     <h1>Kelola Buku</h1>
     <button type="button" class="action-btn update-btn" onclick="openAddModal()">+ Tambah Buku</button>
+    <!-- SEARCH & SORT -->
+    <form class="search-form" method="GET" action="dashboard_admin.php">
+        <input type="hidden" name="page" value="books">
 
+        <input type="text" name="search" placeholder="Cari buku..."
+            value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
+
+        <select name="sort">
+            <option value="">-- Urutkan --</option>
+            <option value="newest" <?= ($sort=='newest'?'selected':'') ?>>Terbaru</option>
+            <option value="oldest" <?= ($sort=='oldest'?'selected':'') ?>>Terlama</option>
+            <option value="title_asc" <?= ($sort=='title_asc'?'selected':'') ?>>Judul A-Z</option>
+            <option value="title_desc" <?= ($sort=='title_desc'?'selected':'') ?>>Judul Z-A</option>
+        </select>
+
+        <button type="submit">Cari</button>
+
+        <?php if(isset($_GET['search']) || isset($_GET['sort'])): ?>
+            <a class="reset-btn" href="dashboard_admin.php?page=books">Reset</a>
+        <?php endif; ?>
+    </form>
+    <!-- END SEARCH & SORT -->
     <h3>Daftar Buku</h3>
     <table class="books-table">
     <tr>
@@ -109,19 +145,20 @@ $categories = CategoriesController::getAllCategories();
                 <td><?= htmlspecialchars($row['stock'] ?? 0); ?></td>
                 <td><?= htmlspecialchars($row['status']); ?></td>
                 <td>
-                    <button type="button" class="action-btn update-btn"
-                        onclick="openEditModal(
-                            '<?= $row['id'] ?>',
-                            '<?= htmlspecialchars($row['title'], ENT_QUOTES) ?>',
-                            '<?= htmlspecialchars($row['author'], ENT_QUOTES) ?>',
-                            '<?= htmlspecialchars($row['publisher'], ENT_QUOTES) ?>',
-                            '<?= $row['category_id'] ?>',
-                            '<?= $row['publish_date'] ?>',
-                            '<?= htmlspecialchars($row['description'], ENT_QUOTES) ?>',
-                            '<?= $row['stock'] ?>',
-                            '<?= $row['status'] ?>'
-                        )"
-                        >Edit</button>
+                <button type="button" class="action-btn update-btn"
+                    onclick="openEditModal(
+                        '<?= $row['id'] ?>',
+                        '<?= htmlspecialchars($row['title']) ?>',
+                        '<?= htmlspecialchars($row['author']) ?>',
+                        '<?= htmlspecialchars($row['publisher']) ?>',
+                        '<?= $row['category_id'] ?>',
+                        '<?= $row['publish_date'] ?>',
+                        `<?= htmlspecialchars($row['description']) ?>`,
+                        '<?= $row['status'] ?>',
+                        '<?= $row['stock'] ?>'
+                    )"
+                > Edit </button>
+
                     <a href="../public/dashboard_admin.php?page=books&delete=<?= $row['id']; ?>"
                        class="action-btn delete-btn"
                        onclick="return confirm('Hapus buku ini?')">Hapus</a>
@@ -132,6 +169,27 @@ $categories = CategoriesController::getAllCategories();
         <tr><td colspan="9" style="text-align:center;">Belum ada buku</td></tr>
     <?php endif; ?>
 </table>
+
+<div class="pagination">
+    <?php 
+        $extra = "&sort=$sort&search=$search";
+    ?>
+
+    <?php if ($page_now > 1): ?>
+        <a href="dashboard_admin.php?page=books&p=<?= $page_now - 1 ?><?= $extra ?>">&laquo; Prev</a>
+    <?php endif; ?>
+
+    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+        <a href="dashboard_admin.php?page=books&p=<?= $i ?><?= $extra ?>"
+           class="<?= ($i == $page_now) ? 'active' : '' ?>">
+           <?= $i ?>
+        </a>
+    <?php endfor; ?>
+
+    <?php if ($page_now < $total_pages): ?>
+        <a href="dashboard_admin.php?page=books&p=<?= $page_now + 1 ?><?= $extra ?>">Next &raquo;</a>
+    <?php endif; ?>
+</div>
 
 
 <!-- Modal Tambah Buku -->
@@ -153,7 +211,7 @@ $categories = CategoriesController::getAllCategories();
         <input type="date" name="publish_date" required>
 
         <label for="description">Deskripsi Buku</label>
-        <textarea name="description" rows="3" ...></textarea>
+        <textarea name="description" id="add_description" rows="3" required></textarea>
 
         <label for="cover">Cover Buku</label>
         <input type="file" name="cover" accept="image/*">
@@ -196,6 +254,7 @@ $categories = CategoriesController::getAllCategories();
 
         <label>Deskripsi Buku</label>
         <textarea name="description" id="edit_description" rows="3" required></textarea>
+
         
         <label>Ganti Cover (opsional)</label>
         <input type="file" name="cover" accept="image/*">
@@ -214,32 +273,5 @@ $categories = CategoriesController::getAllCategories();
   </div>
 </div>
 
-<script>
-function openAddModal() { 
-    document.getElementById("addModal").style.display = "block"; 
-}
-function closeAddModal() { 
-    document.getElementById("addModal").style.display = "none"; 
-}
-
-function openEditModal(id, title, author, publisher, category, publish_date, description, status, stock) {
-
-    document.getElementById("edit_id").value = id;
-    document.getElementById("edit_title").value = title;
-    document.getElementById("edit_author").value = author;
-    document.getElementById("edit_publisher").value = publisher;
-
-    document.getElementById("edit_category").value = category;
-    document.getElementById("edit_publish_date").value = publish_date;
-
-    document.getElementById("edit_description").value = description;
-
-    document.getElementById("edit_status").value = status;
-
-    document.getElementById("editModal").style.display = "block";
-}
-
-function closeEditModal() { 
-    document.getElementById("editModal").style.display = "none"; 
-}
+<script src="assets/js/admin/manage.js">
 </script>

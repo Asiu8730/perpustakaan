@@ -2,19 +2,18 @@
 <html>
 <head>
     <title>Dashboard Admin</title>
-    <link rel="stylesheet" href="/reca/perpustakaan/public/assets/css/admin/navbar.css">
+    <link rel="stylesheet" href="/reca/perpustakaan/public/assets/css/admin/sidebar.css">
 </head>
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
         <h2>Admin Panel</h2>
         <ul>
-            <div class="notification-container">
-            <li><a href="/reca/perpustakaan/public/dashboard_admin.php?page=books">Kelola Buku</a></li>
-            <li><a href="/reca/perpustakaan/public/dashboard_admin.php?page=users">Kelola User</a></li>
-            <li><a href="/reca/perpustakaan/public/dashboard_admin.php?page=categories">Kelola Kategori</a></li>
-            <li><a href="/reca/perpustakaan/public/dashboard_admin.php?page=loans">Kelola Peminjaman</a></li>
-            <li><a href="/reca/perpustakaan/public/logout.php">Logout</a></li>
+            <li onclick="location.href='/reca/perpustakaan/public/dashboard_admin.php?page=books'">Kelola Buku</li>
+            <li onclick="location.href='/reca/perpustakaan/public/dashboard_admin.php?page=users'">Kelola User</li>
+            <li onclick="location.href='/reca/perpustakaan/public/dashboard_admin.php?page=categories'">Kelola Kategori</li>
+            <li onclick="location.href='/reca/perpustakaan/public/dashboard_admin.php?page=loans'">Kelola Peminjaman</li>
+            <li onclick="location.href='/reca/perpustakaan/public/logout.php'">Logout</li>
         </ul>
     </div>
 

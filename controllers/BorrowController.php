@@ -303,6 +303,92 @@ class BorrowController {
     $_SESSION['deadline_notified'] = true;
 }
 
+    public static function getPaginatedBorrows($limit, $offset) {
+    global $conn;
+    $sql = "SELECT borrows.*, users.username, books.title
+            FROM borrows
+            LEFT JOIN users ON borrows.user_id = users.id
+            LEFT JOIN books ON borrows.book_id = books.id
+            ORDER BY borrows.id DESC
+            LIMIT ? OFFSET ?";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $limit, $offset);
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+public static function countBorrows() {
+    global $conn;
+    $res = $conn->query("SELECT COUNT(*) AS total FROM borrows");
+    return $res->fetch_assoc()['total'];
+}
+
+public static function searchBorrows($keyword, $limit, $offset) {
+    global $conn;
+    $keyword = "%$keyword%";
+
+    $sql = "SELECT borrows.*, users.username, books.title
+            FROM borrows
+            LEFT JOIN users ON borrows.user_id = users.id
+            LEFT JOIN books ON borrows.book_id = books.id
+            WHERE users.username LIKE ? OR books.title LIKE ?
+            ORDER BY borrows.id DESC
+            LIMIT ? OFFSET ?";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssii", $keyword, $keyword, $limit, $offset);
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+public static function countSearchBorrows($keyword) {
+    global $conn;
+    $keyword = "%$keyword%";
+
+    $sql = "SELECT COUNT(*) AS total
+            FROM borrows
+            LEFT JOIN users ON borrows.user_id = users.id
+            LEFT JOIN books ON borrows.book_id = books.id
+            WHERE users.username LIKE ? OR books.title LIKE ?";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $keyword, $keyword);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc()['total'];
+}
+
+public static function getPaginatedUserBorrows($user_id, $limit, $offset) {
+    global $conn;
+
+    $stmt = $conn->prepare("
+        SELECT borrows.*, books.title
+        FROM borrows
+        LEFT JOIN books ON borrows.book_id = books.id
+        WHERE borrows.user_id = ?
+        ORDER BY borrows.id DESC
+        LIMIT ? OFFSET ?
+    ");
+
+    $stmt->bind_param("iii", $user_id, $limit, $offset);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+public static function countUserBorrows($user_id) {
+    global $conn;
+
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) AS total
+        FROM borrows
+        WHERE user_id = ?
+    ");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc()['total'];
+}
+
+
 
 }
 ?>
