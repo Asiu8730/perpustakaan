@@ -18,7 +18,7 @@ if (
 ) {
     $book_id = intval($_GET['id']);
 
-    // Jika request via fetch() AJAX
+    // Jika request via fetch() AJAX 
     if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
         strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
 
@@ -40,6 +40,13 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'user') {
 }
 
 $page = $_GET['page'] ?? 'dashboard';
+$user_id = $_SESSION['user_id'] ?? null;
+
+// 🔴 TAMBAH INI DI PALING ATAS SEBELUM INCLUDE PAGE
+if ($user_id) {
+    BorrowController::notifyDeadline($user_id);
+}
+
 $viewPath = __DIR__ . '/../view/user/';
 
 switch ($page) {

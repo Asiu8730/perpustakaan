@@ -53,7 +53,7 @@ $notif_count = NotificationController::countUnread($_SESSION['user_id']);
                 </div>
                 <ul>
                     <li><a href="/reca/perpustakaan/public/dashboard_user.php?page=borrowed">Daftar Pinjam</a></li>
-                    <li><a href="/reca/perpustakaan/public/dashboard_user.php?page=cart">Keranjang</a></li>
+                    <li><a href="/reca/perpustakaan/public/dashboard_user.php?page=cart">Booking</a></li>
                     <li><a href="/reca/perpustakaan/public/dashboard_user.php?page=setting">Akun</a></li>
                     <li><a href="/reca/perpustakaan/public/dashboard_user.php?page=notification">Notifikasi</a></li>
                     <li><a href="/reca/perpustakaan/public/logout.php" class="logout-link">Keluar Akun</a></li>

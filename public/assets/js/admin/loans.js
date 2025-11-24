@@ -12,16 +12,21 @@ function openConfirmModal(id, title, borrower, type) {
     if (type === "peminjaman") {
         returnDateContainer.style.display = "block";
         modalTitle.textContent = "Konfirmasi Peminjaman Buku";
-        returnDateInput.value = ""; 
+        returnDateInput.value = "";
     } else {
         returnDateContainer.style.display = "none";
         modalTitle.textContent = "Konfirmasi Pengembalian Buku";
     }
 
+    if (type === "pengembalian") {
+        document.getElementById("method").value = "langsung";
+    } else {
+        document.getElementById("method").value = "web";
+    }
+
     modal.style.display = "block";
 }
 
-// ✅ TAMBAH INI
 function closeConfirmModal() {
     document.getElementById("confirmModal").style.display = "none";
 }

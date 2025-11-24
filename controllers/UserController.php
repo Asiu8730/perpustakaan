@@ -12,12 +12,26 @@ class UserController {
         return $stmt->execute();
     }
 
-    public static function updateUser($id, $username, $email, $role) {
-        global $conn;
-        $stmt = $conn->prepare("UPDATE users SET username=?, email=?, role=? WHERE id=?");
+    public static function updateUser($id, $username, $email, $role, $password = null) {
+    global $conn;
+
+    // Jika password tidak diisi → jangan update password
+    if ($password === null || $password === "") {
+        $stmt = $conn->prepare("
+            UPDATE users SET username=?, email=?, role=? WHERE id=?
+        ");
         $stmt->bind_param("sssi", $username, $email, $role, $id);
         return $stmt->execute();
     }
+
+    // Jika password diisi → hash & update
+    $hashed = password_hash($password, PASSWORD_DEFAULT);
+    $stmt = $conn->prepare("
+        UPDATE users SET username=?, email=?, role=?, password=? WHERE id=?
+    ");
+    $stmt->bind_param("ssssi", $username, $email, $role, $hashed, $id);
+    return $stmt->execute();
+}
 
     public static function deleteUser($id) {
         global $conn;

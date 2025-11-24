@@ -8,6 +8,7 @@ if (isset($_POST['confirm'])) {
     $loan_id = $_POST['loan_id'];
     $return_date = $_POST['return_date'] ?? null;
     $action_type = $_POST['action_type'] ?? '';
+    $method = $_POST['method'] ?? 'web';
 
     if ($action_type === 'peminjaman') {
         BorrowController::updateStatus($loan_id, 'dipinjam', $return_date);
@@ -89,22 +90,36 @@ $total_pages = ceil($total_data / $limit);
             <td>
                 <?php if ($row['status'] === 'menunggu_konfirmasi_admin'): ?>
                     <button class="action-btn update-btn"
-                        onclick="openConfirmModal('<?= $row['id'] ?>',
-                                                  '<?= htmlspecialchars($row['title'], ENT_QUOTES) ?>',
-                                                  '<?= htmlspecialchars($row['username'], ENT_QUOTES) ?>',
-                                                  'peminjaman')">Konfirmasi Peminjaman
+                        onclick="openConfirmModal(
+                            '<?= $row['id'] ?>',
+                            '<?= htmlspecialchars($row['title'], ENT_QUOTES) ?>',
+                            '<?= htmlspecialchars($row['username'], ENT_QUOTES) ?>',
+                            'peminjaman'
+                        )">
+                        Konfirmasi Peminjaman
                     </button>
 
                 <?php elseif ($row['status'] === 'menunggu_konfirmasi_pengembalian'): ?>
                     <button class="action-btn update-btn"
-                        onclick="openConfirmModal('<?= $row['id'] ?>',
-                                                  '<?= htmlspecialchars($row['title'], ENT_QUOTES) ?>',
-                                                  '<?= htmlspecialchars($row['username'], ENT_QUOTES) ?>',
-                                                  'pengembalian')">Konfirmasi Pengembalian
+                        onclick="openConfirmModal(
+                            '<?= $row['id'] ?>',
+                            '<?= htmlspecialchars($row['title'], ENT_QUOTES) ?>',
+                            '<?= htmlspecialchars($row['username'], ENT_QUOTES) ?>',
+                            'pengembalian'
+                        )">
+                        Konfirmasi Pengembalian
                     </button>
 
                 <?php elseif ($row['status'] === 'dipinjam'): ?>
-                    <span class="status warning">Dipinjam (Tenggat: <?= $row['return_date']; ?>)</span>
+                    <button class="action-btn update-btn"
+                        onclick="openConfirmModal(
+                            '<?= $row['id'] ?>',
+                            '<?= htmlspecialchars($row['title'], ENT_QUOTES) ?>',
+                            '<?= htmlspecialchars($row['username'], ENT_QUOTES) ?>',
+                            'pengembalian'
+                        )">
+                        Pengembalian Langsung
+                    </button>
 
                 <?php elseif ($row['status'] === 'dikembalikan'): ?>
                     <span class="status selesai">Selesai</span>
@@ -136,7 +151,7 @@ $total_pages = ceil($total_data / $limit);
     </div>
 </div>
 
-<!-- MODAL KONFIRMASI (SAMA DENGAN MODAL TAMBAH/EDIT BUKU) -->
+<!-- MODAL KONFIRMASI -->
 <div id="confirmModal" class="modal">
   <div class="modal-content">
 
@@ -159,6 +174,8 @@ $total_pages = ceil($total_data / $limit);
             <label>Tanggal Pengembalian</label>
             <input type="date" name="return_date" id="return_date">
         </div>
+
+        <input type="hidden" name="method" id="method" value="web">
 
         <button type="submit" name="confirm" class="btn-blue">Konfirmasi</button>
     </form>

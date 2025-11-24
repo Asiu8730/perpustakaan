@@ -27,7 +27,7 @@ $keyword = $_GET['search'] ?? "";
 
 // Pagination
 $page = isset($_GET['p']) ? intval($_GET['p']) : 1;
-$limit = 5;
+$limit = 10;
 $offset = ($page - 1) * $limit;
 
 if (!empty($keyword)) {

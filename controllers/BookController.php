@@ -28,6 +28,26 @@ class BookController {
         return $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
     }
 
+    public static function updateStatus($loan_id, $status, $return_date = null, $method = 'web') {
+        global $conn;
+
+        if ($status === 'dipinjam') {
+            $stmt = $conn->prepare("
+                UPDATE borrows SET status=?, return_date=?, metode_pengajuan=? WHERE id=?
+            ");
+            $stmt->bind_param("sssi", $status, $return_date, $method, $loan_id);
+
+        } elseif ($status === 'dikembalikan') {
+            $stmt = $conn->prepare("
+                UPDATE borrows SET status=?, metode_pengajuan=? WHERE id=?
+            ");
+            $stmt->bind_param("ssi", $status, $method, $loan_id);
+        }
+
+        return $stmt->execute();
+    }
+
+
 
     /* ==========================================================
        TAMBAH BUKU
@@ -230,5 +250,6 @@ public static function countBooks() {
     $data = $res->fetch_assoc();
     return $data['total'] ?? 0;
 }
+
 
 }

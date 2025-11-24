@@ -10,6 +10,7 @@ function openEditModal(id, username, email, role) {
     document.getElementById("edit_username").value = username;
     document.getElementById("edit_email").value = email;
     document.getElementById("edit_role").value = role;
+    document.getElementById("edit_password").value = "";
     document.getElementById("editModal").style.display = "block";
 }
 function closeEditModal() {

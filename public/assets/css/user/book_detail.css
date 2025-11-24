@@ -150,3 +150,22 @@
     }
 
 }
+
+
+/* ===== Tombol Kembali (Merah) ===== */
+.back-btn {
+    display: inline-block;
+    background-color: #d93030;   /* merah */
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s ease;
+    margin-top: 15px;
+}
+
+.back-btn:hover {
+    background-color: #b32525; /* lebih gelap saat hover */
+}

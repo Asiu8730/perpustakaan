@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../controllers/BookController.php';
 require_once __DIR__ . '/../../controllers/CategoriesController.php';
+require_once __DIR__ . '/../../controllers/BorrowController.php';
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'user') {
     header("Location: ../../public/login.php");
@@ -9,11 +10,17 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'user') {
 }
 
 $username = $_SESSION['username'] ?? 'User';
+$user_id = $_SESSION['user_id'];
+
+// 🔴 TAMBAH INI - CEK NOTIFIKASI DEADLINE
+BorrowController::notifyDeadline($user_id);
+BorrowController::checkDueDatesForUser($user_id);
+
 $categories = CategoriesController::getAllCategories();
 $booksByCategory = [];
 
 foreach ($categories as $category) {
-    $booksByCategory[$category['id']] = BookController::getBooksByCategory($category['id']);
+    $booksByCategory[$category['id']] = BookController::getBooksByCategory($category['id'], 7, 0);
 }
 ?>
 <!DOCTYPE html>
@@ -77,7 +84,7 @@ foreach ($categories as $category) {
                     <p class="no-books">Tidak ada buku di kategori ini.</p>
 
                 <?php else:
-                    foreach (array_slice($books, 0, 12) as $book): ?>
+                    foreach (array_slice($books, 0, 7) as $book): ?>
                     <a href="/reca/perpustakaan/public/dashboard_user.php?page=book_detail&id=<?= $book['id']; ?>" class="book-link">
                         <div class="book-card">
                             <div class="book-image">
@@ -129,7 +136,7 @@ foreach ($categories as $category) {
 
         <!-- Copyright -->
         <p class="footer-copy">
-            © <?= date("Y"); ?> Perpustakaan Digital — All Rights Reserved.
+            © <?= date("Y"); ?> Perpustakaan  — All Rights Reserved.
         </p>
 
     </div>

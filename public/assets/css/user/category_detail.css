@@ -1,0 +1,115 @@
+/* ================================
+   CATEGORY DETAIL PAGE ONLY
+================================ */
+
+.category-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 20px 40px;
+}
+
+.category-container .title {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: #1f2937;
+}
+
+/* GRID – Limit 7 per baris (auto center) */
+.books-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 22px;
+    justify-items: center; /* ⬅️ card berada di tengah */
+}
+
+/* Responsif */
+@media (max-width: 1100px) {
+    .books-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .books-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* CARD */
+.book-card {
+    width: 150px;
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: 0.25s ease;
+}
+
+.book-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.book-image {
+    width: 100%;
+    height: 200px;
+    background: #f3f4f6;
+    position: relative;
+}
+
+.book-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.book-image a {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.book-info {
+    padding: 10px;
+}
+
+.book-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    height: 36px;
+    overflow: hidden;
+    line-height: 1.3;
+    color: #111827;
+}
+
+.book-author {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* STATUS */
+.status-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    padding: 3px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    color: white;
+    font-weight: 600;
+}
+
+.status-badge.available {
+    background: #16a34a;
+}
+
+.status-badge.borrowed {
+    background: #dc2626;
+}
+
+.status-badge.unavailable {
+    background: #f59e0b;
+}

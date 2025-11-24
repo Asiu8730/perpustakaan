@@ -75,8 +75,8 @@
 }
 
 .close {
-  color: #aaa;
-  float: right;
+  color: #ff0000;
+  float: right ;
   font-size: 28px;
   font-weight: bold;
   cursor: pointer;

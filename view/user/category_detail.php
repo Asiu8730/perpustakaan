@@ -11,6 +11,7 @@ if (!isset($_GET['id'])) {
 $category_id = $_GET['id'];
 $category = CategoriesController::getCategoryById($category_id);
 $books = BookController::getBooksByCategory($category_id);
+$books = array_slice($books, 0, 35); // Maksimal 5 baris (7 x 5)
 
 if (!$category) {
     echo "Kategori tidak valid.";
@@ -23,7 +24,7 @@ if (!$category) {
 <head>
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($category['name']); ?></title>
-    <link rel="stylesheet" href="assets/css/user/users_dashboard.css">
+    <link rel="stylesheet" href="assets/css/user/category_detail.css">
     <link rel="stylesheet" href="assets/css/global.css">
 </head>
 <body>
@@ -40,16 +41,18 @@ if (!$category) {
             <?php foreach ($books as $book): ?>
                 <div class="book-card">
                     <div class="book-image">
-                <a href="/reca/perpustakaan/public/dashboard_user.php?page=book_detail&id=<?= $book['id']; ?>">
-                    <img src="../uploads/covers/<?= htmlspecialchars($book['cover'] ?: 'no_cover.png'); ?>" alt="Cover Buku">
-                </a>
+                        <a href="/reca/perpustakaan/public/dashboard_user.php?page=book_detail&id=<?= $book['id']; ?>">
+                            <img src="../uploads/covers/<?= htmlspecialchars($book['cover'] ?: 'no_cover.png'); ?>" alt="Cover Buku">
+                        </a>
 
-                <?php if ($book['status'] === 'Dipinjam'): ?>
-                    <span class="status-badge borrowed">Dipinjam</span>
-                <?php elseif ($book['status'] === 'Tersedia'): ?>
-                    <span class="status-badge available">Tersedia</span>
-                <?php endif; ?>
-                </div>
+                        <?php if ($book['status'] === 'Dipinjam'): ?>
+                            <span class="status-badge borrowed">Dipinjam</span>
+                        <?php elseif ($book['status'] === 'Tersedia'): ?>
+                            <span class="status-badge available">Tersedia</span>
+                        <?php elseif ($book['status'] === 'Tidak Tersedia'): ?>
+                            <span class="status-badge unavailable">Tidak Tersedia</span>
+                        <?php endif; ?>
+                    </div>
                     <div class="book-info">
                         <h4 class="book-title"><?= htmlspecialchars($book['title']); ?></h4>
                         <p class="book-author"><?= htmlspecialchars($book['author']); ?></p>

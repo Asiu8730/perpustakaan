@@ -53,6 +53,37 @@ class BorrowController {
         return true;
     }
 
+    public static function deleteBook($id) {
+    global $conn;
+
+    // Cek penggunaan di borrows
+    $check = $conn->prepare("SELECT COUNT(*) AS total FROM borrows WHERE book_id = ?");
+    $check->bind_param("i", $id);
+    $check->execute();
+    $res = $check->get_result()->fetch_assoc();
+
+    if ($res['total'] > 0) {
+        return [
+            "status" => "error",
+            "message" => "Buku tidak dapat dihapus karena memiliki histori peminjaman!"
+        ];
+    }
+
+    // Hapus buku
+    $stmt = $conn->prepare("DELETE FROM books WHERE id = ?");
+    $stmt->bind_param("i", $id);
+
+    if ($stmt->execute()) {
+        return ["status" => "success"];
+    }
+
+    return [
+        "status" => "error",
+        "message" => "Gagal menghapus buku."
+    ];
+}
+
+
     public static function getAllBorrows() {
         global $conn;
         $sql = "SELECT borrows.*, users.username, books.title 
@@ -74,6 +105,7 @@ class BorrowController {
     $res = $getBorrow->get_result()->fetch_assoc();
     $book_id = $res['book_id'] ?? null;
     $old_return_date = $res['return_date'];
+    
 
     if ($status === 'dipinjam') {
         // bila admin memilih return_date maka set, else biarkan
@@ -92,7 +124,6 @@ class BorrowController {
             $s = $conn->query("SELECT stock FROM books WHERE id=$book_id")->fetch_assoc();
             $stock = intval($s['stock'] ?? 0);
             $stock = max(0, $stock - 1);
-            // update stock dan status buku
             $newStatus = ($stock <= 0) ? 'Tidak Tersedia' : 'Dipinjam';
             $upd = $conn->prepare("UPDATE books SET stock=?, status=? WHERE id=?");
             $upd->bind_param("isi", $stock, $newStatus, $book_id);
@@ -119,8 +150,6 @@ class BorrowController {
     }
     return true;
 }
-
-
 
     public static function requestReturn($loan_id) {
         global $conn;
@@ -181,67 +210,71 @@ class BorrowController {
     }
 
     public static function checkDueDatesForUser($user_id) {
-    global $conn;
+        global $conn;
 
-    // Ambil semua peminjaman yang masih berjalan
-    $stmt = $conn->prepare("
-        SELECT borrows.*, books.title 
-        FROM borrows
-        LEFT JOIN books ON borrows.book_id = books.id
-        WHERE borrows.user_id = ?
-        AND borrows.status = 'dipinjam'
-    ");
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+        // Ambil semua peminjaman yang masih berjalan
+        $stmt = $conn->prepare("
+            SELECT borrows.*, books.title 
+            FROM borrows
+            LEFT JOIN books ON borrows.book_id = books.id
+            WHERE borrows.user_id = ?
+            AND borrows.status = 'dipinjam'
+        ");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    while ($row = $result->fetch_assoc()) {
+        while ($row = $result->fetch_assoc()) {
 
-        $due_date = $row['return_date'];
-        $book_title = $row['title'];
-        $borrow_id = $row['id'];
+            $due_date = $row['return_date'];
+            $book_title = $row['title'];
+            $borrow_id = $row['id'];
 
-        if (!$due_date) continue;
+            if (!$due_date) continue;
 
-        $today = date('Y-m-d');
-        $days_left = (strtotime($due_date) - strtotime($today)) / 86400;
+            $today = date('Y-m-d');
+            $days_left = (strtotime($due_date) - strtotime($today)) / 86400;
 
-        $message = null;
+            $message = null;
 
-        if ($days_left == 1) {
-            $message = "Besok adalah batas pengembalian buku: $book_title";
-        } 
-        elseif ($days_left == 0) {
-            $message = "Hari ini adalah batas pengembalian buku: $book_title";
-        }
-        elseif ($days_left < 0) {
-            $late = abs($days_left);
-            $message = "Anda terlambat $late hari mengembalikan buku: $book_title";
-        }
+            // 🔥 Besok tenggat
+            if ($days_left == 1) {
+                $message = "Besok adalah batas pengembalian buku: $book_title";
+            } 
+            // 🔥 Hari ini tenggat — kirim pesan jam 4 sore
+            elseif ($days_left == 0) {
+                $message = "Hari ini batas pengembalian buku '$book_title'. Harap dikembalikan sebelum pukul 16:00 sore.";
+            }
+            // 🔥 Sudah terlambat
+            elseif ($days_left < 0) {
+                $late = abs($days_left);
+                $message = "Anda terlambat $late hari mengembalikan buku: $book_title";
+            }
 
-        if ($message) {
-            // Cek agar notif tidak duplikat
-            $check = $conn->prepare("
-                SELECT id FROM notifications 
-                WHERE user_id = ? 
-                AND message = ?
-                LIMIT 1
-            ");
-            $check->bind_param("is", $user_id, $message);
-            $check->execute();
-            $exists = $check->get_result()->num_rows > 0;
-
-            if (!$exists) {
-                $ins = $conn->prepare("
-                    INSERT INTO notifications (user_id, message, created_at) 
-                    VALUES (?, ?, NOW())
+            if ($message) {
+                // Cek agar notif tidak duplikat
+                $check = $conn->prepare("
+                    SELECT id FROM notifications 
+                    WHERE user_id = ? 
+                    AND message = ?
+                    LIMIT 1
                 ");
-                $ins->bind_param("is", $user_id, $message);
-                $ins->execute();
+                $check->bind_param("is", $user_id, $message);
+                $check->execute();
+                $exists = $check->get_result()->num_rows > 0;
+
+                if (!$exists) {
+                    $ins = $conn->prepare("
+                        INSERT INTO notifications (user_id, message, created_at) 
+                        VALUES (?, ?, NOW())
+                    ");
+                    $ins->bind_param("is", $user_id, $message);
+                    $ins->execute();
+                }
             }
         }
     }
-}
+
 
     public static function notifyDeadline($user_id = null) {
     global $conn;
@@ -249,7 +282,7 @@ class BorrowController {
     if (!isset($_SESSION)) session_start();
 
     // ❗ Cegah duplikasi — hanya 1x per session
-    if (!empty($_SESSION['deadline_notified'])) {
+    if (!empty($_SESSION['deadline_notified_' . $user_id])) {
         return;
     }
 
@@ -271,27 +304,36 @@ class BorrowController {
     while ($row = $res->fetch_assoc()) {
         $due_date = $row['return_date'];
         $book_title = $row['title'];
+        $borrow_id = $row['id'];
 
-        // 3 hari sebelum jatuh tempo
-        if (strtotime($due_date) - strtotime($today) <= (3 * 24 * 60 * 60)) {
+        if (!$due_date) continue;
 
-            // Cek apakah notifikasi sudah dibuat sebelumnya
+        // Hitung sisa hari
+        $days_left = (strtotime($due_date) - strtotime($today)) / 86400;
+
+        // 🔴 Syarat: 3 hari sebelum jatuh tempo
+        if ($days_left <= 3 && $days_left > 0) {
+
+            $msg = "Tenggat waktu pengembalian buku '$book_title' tinggal " . ceil($days_left) . " hari lagi!";
+
+            // Cek duplikasi LEBIH KETAT
             $check = $conn->prepare("
                 SELECT id FROM notifications
-                WHERE user_id = ? AND message LIKE ?
+                WHERE user_id = ?
+                AND DATE(created_at) = ?
+                AND message LIKE ?
                 LIMIT 1
             ");
-            $msgLike = "%$book_title%";
-            $check->bind_param("is", $user_id, $msgLike);
+            $today_date = date('Y-m-d');
+            $pattern = "%$book_title%";
+            $check->bind_param("iss", $user_id, $today_date, $pattern);
             $check->execute();
-            $exist = $check->get_result();
 
-            if ($exist->num_rows == 0) {
-                // Buat notifikasi baru
-                $msg = "Tenggat waktu pengembalian buku '$book_title' tinggal 3 hari lagi!";
+            if ($check->get_result()->num_rows == 0) {
+                // Buat notifikasi BARU
                 $notif = $conn->prepare("
-                    INSERT INTO notifications (user_id, message)
-                    VALUES (?, ?)
+                    INSERT INTO notifications (user_id, message, is_read, created_at)
+                    VALUES (?, ?, 0, NOW())
                 ");
                 $notif->bind_param("is", $user_id, $msg);
                 $notif->execute();
@@ -299,8 +341,8 @@ class BorrowController {
         }
     }
 
-    // ❗ Tandai bahwa notifikasi deadline sudah diproses dalam session ini
-    $_SESSION['deadline_notified'] = true;
+    // Tandai sudah diproses
+    $_SESSION['deadline_notified_' . $user_id] = true;
 }
 
     public static function getPaginatedBorrows($limit, $offset) {

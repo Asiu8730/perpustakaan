@@ -63,7 +63,7 @@ foreach ($categories as $category) {
                     <p class="no-books">Tidak ada buku di kategori ini.</p>
 
                 <?php else:
-                    foreach (array_slice($books, 0, 12) as $book): ?>
+                    foreach (array_slice($books, 0, 7) as $book): ?>
                     <a href="/reca/perpustakaan/public/dashboard_guest.php?page=book_detail&id=<?= $book['id']; ?>" class="book-link">
                         <div class="book-card">
                             <div class="book-image">
@@ -104,7 +104,7 @@ foreach ($categories as $category) {
         </div>
 
         <p class="footer-copy">
-            © <?= date("Y"); ?> Perpustakaan Digital — All Rights Reserved.
+            © <?= date("Y"); ?> Perpustakaan — All Rights Reserved.
         </p>
 
     </div>

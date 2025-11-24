@@ -30,7 +30,16 @@ if (isset($_POST['add'])) {
 }
 
 if (isset($_POST['update'])) {
-    UserController::updateUser($_POST['id'], $_POST['username'], $_POST['email'], $_POST['role']);
+    $password = ($_POST['password'] !== "") ? $_POST['password'] : null;
+
+    UserController::updateUser(
+        $_POST['id'],
+        $_POST['username'],
+        $_POST['email'],
+        $_POST['role'],
+        $password
+    );
+
     header("Location: dashboard_admin.php?page=users");
     exit();
 }
@@ -158,7 +167,7 @@ if (isset($_GET['delete'])) {
         <input type="hidden" name="id" id="edit_id">
         <input type="text" name="username" id="edit_username">
         <input type="email" name="email" id="edit_email">
-
+        <input type="password" name="password" id="edit_password" placeholder="Isi jika ingin ubah password">
         <select name="role" id="edit_role">
             <option value="admin">Admin</option>
             <option value="user">User</option>

@@ -11,7 +11,7 @@ body {
 ======================================= */
 .welcome {
     padding: 35px 40px 10px;
-    text-align: center; /* 🔥 bikin welcome di tengah */
+    text-align: center;
 }
 
 .welcome h2 {
@@ -55,29 +55,6 @@ body {
 
 .see-more:hover {
     color: #1e40af;
-}
-
-/* =======================================
-   CATEGORY DETAIL (TITLE TENGAH)
-======================================= */
-.category-container {
-    padding: 20px 40px;
-}
-
-.category-container .title {
-    text-align: center;       /* 🔥 sesuai permintaan */
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 20px;
-    color: #1f2937;
-}
-
-/* Grid tampilan buku pada category_detail */
-.books-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
-    gap: 20px;
-    padding-top: 10px;
 }
 
 /* =======================================
@@ -144,11 +121,11 @@ body {
     position: absolute;
     top: 8px;
     left: 8px;
-    padding: 3px 9px;
+    padding: 3px 10px;
+    border-radius: 8px;
     font-size: 11px;
-    border-radius: 10px;
     color: white;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .status-badge.available {
@@ -156,19 +133,12 @@ body {
 }
 
 .status-badge.borrowed {
-    background: #f7dbdb;
+    background: #dc2626;
 }
 
 .status-badge.unavailable {
-    background: #df5454;      /* Abu-abu */
-    color: white;
-    padding: 4px 10px;
-    font-size: 12px;
-    border-radius: 6px;
-    position: absolute;
-    top: 8px;
+    background: #f59e0b;
 }
-
 
 /* =======================================
    BOOK INFO
@@ -193,14 +163,6 @@ body {
     margin-bottom: 4px;
 }
 
-/* =======================================
-   GRID BOOK FOR CATEGORY DETAIL
-======================================= */
-.books-grid .book-card {
-    width: 100%; /* otomatis menyesuaikan grid */
-}
-
-
 .book-link {
     text-decoration: none;
     color: inherit;
@@ -210,27 +172,6 @@ body {
 .book-link:hover .book-card {
     transform: translateY(-5px);
 }
-/* 
-.main-content {
-    max-width: 1200px;    
-    margin-left: 20rem;   
-    margin-right: 10rem;   
-} */
-
-/* Responsif untuk layar kecil */
-/* @media (max-width: 992px) {
-    .main-content {
-        margin-left: 40px;
-        margin-right: 20px;
-    }
-} */
-/* 
-@media (max-width: 768px) {
-    .main-content {
-        margin-left: 10px;
-        margin-right: 10px;
-    }
-} */
 
 .footer {
     background: #ffffff;
@@ -345,7 +286,6 @@ body {
 }
 
 /* ARROW BUTTONS */
-/* Tombol scroll */
 .scroll-btn {
     position: absolute;
     top: 50%;
@@ -360,11 +300,10 @@ body {
     font-size: 20px;
     font-weight: bold;
     z-index: 20;
-    opacity: 1; /* 🔥 SELALU TAMPIL */
+    opacity: 1;
     transition: 0.2s ease;
 }
 
-/* Posisi kiri & kanan */
 .scroll-left {
     left: -15px;
 }
@@ -373,30 +312,27 @@ body {
     right: -15px;
 }
 
-/* Saat tidak bisa di-klik */
 .scroll-btn.disabled {
     opacity: 0.3;
     cursor: default;
     pointer-events: none;
 }
 
-/* Layout utama center dengan margin kiri lebih besar */
+/* Layout utama center */
 .main-content {
     max-width: 1100px;
     margin: 0 auto;
     padding: 10px 20px 40px;
 }
 
-/* jika ingin ruang kiri lebih besar, gunakan transform atau padding pada container induk */
 .page-wrapper {
     display: flex;
     justify-content: center;
 }
 
-/* untuk menambah offset kiri > kanan: bungkus main-content di .page-inner */
 .page-inner {
     width: 100%;
     max-width: 1100px;
-    margin-left: 6%;  /* sesuaikan, kiri lebih besar */
-    margin-right: 3%;
+    margin: 0 auto;
+    padding: 0 20px;
 }

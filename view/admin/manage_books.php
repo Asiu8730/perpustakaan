@@ -2,6 +2,9 @@
 require_once __DIR__ . '/../../controllers/BookController.php';
 require_once __DIR__ . '/../../controllers/CategoriesController.php';
 
+if ($_SESSION['role'] !== 'admin') die("Akses ditolak");
+
+
 // Folder upload cover
 $upload_dir = __DIR__ . '/../../uploads/covers/';
 if (!file_exists($upload_dir)) mkdir($upload_dir, 0777, true);
@@ -57,7 +60,12 @@ if (isset($_POST['update'])) {
 
 // Hapus buku
 if (isset($_GET['delete'])) {
-    BookController::deleteBook($_GET['delete']);
+    $result = BookController::deleteBook($_GET['delete']);
+
+    if ($result['status'] === 'error') {
+        echo "<script>alert('".$result['message']."');</script>";
+    }
+
     header("Location: ../public/dashboard_admin.php?page=books");
     exit();
 }
