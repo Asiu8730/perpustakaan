@@ -1,3 +1,12 @@
+<?php
+// If the admin requested a print of the reports page, render the report file
+// as a standalone print page and exit early (prevents sidebar/layout from being printed)
+if (isset($_GET['page']) && $_GET['page'] === 'reports_most_borrowed' && isset($_GET['print']) && $_GET['print'] == '1') {
+    include __DIR__ . '/reports_most_borrowed.php';
+    exit; // stop further layout output so print page is clean
+}
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,6 +22,7 @@
             <li onclick="location.href='/reca/perpustakaan/public/dashboard_admin.php?page=users'">Kelola User</li>
             <li onclick="location.href='/reca/perpustakaan/public/dashboard_admin.php?page=categories'">Kelola Kategori</li>
             <li onclick="location.href='/reca/perpustakaan/public/dashboard_admin.php?page=loans'">Kelola Peminjaman</li>
+            <li onclick="location.href='/reca/perpustakaan/public/dashboard_admin.php?page=reports_most_borrowed'">Laporan - Buku Paling Populer</li>
             <li onclick="location.href='/reca/perpustakaan/public/logout.php'">Logout</li>
         </ul>
     </div>
@@ -39,6 +49,9 @@
                 break;
             case 'notifications':
                 include __DIR__ . '/notification.php';
+                break;
+            case 'reports_most_borrowed':
+                include __DIR__ . '/reports_most_borrowed.php';
                 break;
 
         }

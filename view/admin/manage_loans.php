@@ -30,7 +30,7 @@ $keyword = $_GET['search'] ?? '';
 // PAGINATION
 // =======================
 $page = isset($_GET['p']) ? intval($_GET['p']) : 1;
-$limit = 5;
+$limit = 10;
 $offset = ($page - 1) * $limit;
 
 if ($keyword !== '') {
@@ -52,17 +52,43 @@ $total_pages = ceil($total_data / $limit);
 
     <!-- SEARCH BAR -->
     <form method="GET" class="search-form">
-        <input type="hidden" name="page" value="loans">
 
-        <input type="text" name="search" placeholder="Cari nama user / judul buku..."
-               value="<?= htmlspecialchars($keyword) ?>">
+    <input type="hidden" name="page" value="loans">
 
-        <button type="submit">Search</button>
+    <!-- Search -->
+    <input type="text" name="search" placeholder="Cari nama user / judul buku..."
+           value="<?= htmlspecialchars($keyword) ?>">
+    <button type="submit">Search</button>
 
-        <?php if ($keyword !== ''): ?>
-            <a href="dashboard_admin.php?page=loans" class="reset-btn">Reset</a>
-        <?php endif; ?>
+    <?php if ($keyword !== ''): ?>
+        <a href="dashboard_admin.php?page=loans" class="reset-btn">Reset</a>
+    <?php endif; ?>
+
+    <!-- FILTER TAMBAHAN -->
+    <select name="filter" onchange="this.form.submit()">
+        <option value="">-- Filter Berdasarkan --</option>
+        <option value="most_borrowed" <?= isset($_GET['filter']) && $_GET['filter']==='most_borrowed' ? 'selected' : '' ?>>
+            Buku Paling Banyak Dipinjam
+        </option>
+        <option value="returned" <?= isset($_GET['filter']) && $_GET['filter']==='returned' ? 'selected' : '' ?>>
+            Sudah Dikembalikan
+        </option>
+        <option value="borrowed" <?= isset($_GET['filter']) && $_GET['filter']==='borrowed' ? 'selected' : '' ?>>
+            Sedang Dipinjam
+        </option>
+        <option value="pending" <?= isset($_GET['filter']) && $_GET['filter']==='pending' ? 'selected' : '' ?>>
+            Menunggu Konfirmasi
+        </option>
+    </select>
+
+    <!-- TOMBOL CETAK -->
+    <a href="dashboard_admin.php?page=loans&print=1&filter=<?= $_GET['filter'] ?? '' ?>&search=<?= $keyword ?>" 
+       class="btn-blue" target="_blank">
+       Cetak Laporan
+    </a>
+
     </form>
+
 
     <table class="books-table">
         <tr>

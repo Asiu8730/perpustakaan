@@ -46,6 +46,11 @@ class AuthController {
     public static function register($username, $email, $password) {
         global $conn;
 
+        // Validasi panjang password minimal 8 karakter
+        if (strlen($password) < 8) {
+            return "Password harus minimal 8 karakter.";
+        }
+
         // Cek apakah username/email sudah terdaftar
         $stmt = $conn->prepare("SELECT id FROM users WHERE username=? OR email=? LIMIT 1");
         $stmt->bind_param("ss", $username, $email);

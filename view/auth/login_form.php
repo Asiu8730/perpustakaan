@@ -16,7 +16,7 @@
 
         <form method="POST">
             <input type="text" name="username" placeholder="Username" required><br>
-            <input type="password" name="password" placeholder="Password" required><br>
+            <input type="password" name="password" placeholder="Password" required maxlength="8"><br>
             <button type="submit">Login</button>
         </form>
 

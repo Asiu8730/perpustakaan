@@ -430,6 +430,108 @@ public static function countUserBorrows($user_id) {
     return $stmt->get_result()->fetch_assoc()['total'];
 }
 
+public static function mostBorrowedBooks() {
+    global $conn;
+
+    $sql = "
+        SELECT 
+            borrows.book_id,
+            books.title,
+            COUNT(borrows.book_id) AS total_dipinjam
+        FROM borrows
+        INNER JOIN books ON borrows.book_id = books.id
+        GROUP BY borrows.book_id
+        ORDER BY total_dipinjam DESC
+        LIMIT 20
+    ";
+
+    return $conn->query($sql);
+}
+
+/**
+ * Ambil daftar buku berdasarkan jumlah peminjaman, dengan filter tanggal & kategori
+ * $start_date, $end_date dalam format 'YYYY-MM-DD' (nullable)
+ * $category_id (nullable)
+ */
+public static function getMostBorrowedBooksFiltered($start_date = null, $end_date = null, $category_id = null, $limit = 20) {
+    global $conn;
+
+    $sql = "SELECT b.book_id, books.title, books.author, books.category_id, COALESCE(categories.name,'-') AS category_name, COUNT(*) AS total_borrowed
+            FROM borrows b
+            JOIN books ON b.book_id = books.id
+            LEFT JOIN categories ON books.category_id = categories.id
+            WHERE 1=1 ";
+    $types = "";
+    $params = [];
+
+    if (!empty($start_date)) {
+        $sql .= " AND b.borrow_date >= ? ";
+        $types .= "s";
+        $params[] = $start_date;
+    }
+
+    if (!empty($end_date)) {
+        $sql .= " AND b.borrow_date <= ? ";
+        $types .= "s";
+        $params[] = $end_date;
+    }
+
+    if (!empty($category_id)) {
+        $sql .= " AND books.category_id = ? ";
+        $types .= "i";
+        $params[] = intval($category_id);
+    }
+
+    $sql .= " GROUP BY b.book_id
+              ORDER BY total_borrowed DESC
+              LIMIT ?";
+
+    $types .= "i";
+    $params[] = intval($limit);
+
+    $stmt = $conn->prepare($sql);
+    // bind dinamis
+    if ($types !== "") {
+        $stmt->bind_param($types, ...$params);
+    } else {
+        // fallback (shouldn't happen because limit is always bound)
+        $stmt->bind_param("i", $limit);
+    }
+
+    $stmt->execute();
+    $res = $stmt->get_result();
+    return $res->fetch_all(MYSQLI_ASSOC);
+}
+
+public static function filterBorrows($filter, $limit, $offset) {
+    global $conn;
+
+    $where = "";
+
+    switch ($filter) {
+        case "returned":
+            $where = "WHERE borrows.status = 'dikembalikan'";
+            break;
+        case "borrowed":
+            $where = "WHERE borrows.status = 'dipinjam'";
+            break;
+        case "pending":
+            $where = "WHERE borrows.status LIKE 'menunggu%'";
+            break;
+    }
+
+    $sql = "
+        SELECT borrows.*, users.username, books.title
+        FROM borrows
+        INNER JOIN users ON borrows.user_id = users.id
+        INNER JOIN books ON borrows.book_id = books.id
+        $where
+        ORDER BY borrows.id DESC
+        LIMIT $limit OFFSET $offset
+    ";
+
+    return $conn->query($sql);
+}
 
 
 }

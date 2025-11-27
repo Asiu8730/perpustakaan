@@ -50,6 +50,19 @@
     color: #fff;
 }
 
+/* simple blue button used across admin pages */
+.btn-blue {
+    background: #0d6efd;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+.btn-blue:hover { background: #0b5ed7; }
+
 .delete-btn {
     background: #e74c3c;
     color: #fff;
@@ -342,4 +355,33 @@
 
 .pagination a:hover {
     background: #bdc3c7;
+}
+
+/* Deskripsi tabel: batasi tinggi dan aktifkan scroll */
+.books-table td.desc-cell{
+    max-width: 200px;
+    max-height: 120px;     /* tinggi visible sebelum scroll */
+    overflow: auto;
+    text-align: left;
+    white-space: pre-line; /* pertahankan newline dari nl2br */
+    word-wrap: break-word;
+    padding: 10px;
+    font-size: 13px;
+}
+
+/* scrollbar kecil rapi */
+.books-table td.desc-cell::-webkit-scrollbar { height: 8px; width: 8px; }
+.books-table td.desc-cell::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 6px; }
+.books-table td.desc-cell::-webkit-scrollbar-track { background: transparent; }
+
+/* =====================
+   PRINT STYLES (ADMIN)
+   - hide admin controls and sidebar when printing
+   - keep only core content visible when printing
+   ===================== */
+@media print {
+    /* admin UI extras */
+    .sidebar, .search-form, .action-btn, .update-btn, .delete-btn, .reset-btn, .modal, .pagination { display: none !important; }
+    /* ensure table looks clean */
+    body { background: white !important; }
 }

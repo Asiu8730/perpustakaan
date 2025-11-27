@@ -35,9 +35,45 @@ class UserController {
 
     public static function deleteUser($id) {
         global $conn;
-        $stmt = $conn->prepare("DELETE FROM users WHERE id=?");
-        $stmt->bind_param("i", $id);
-        return $stmt->execute();
+        try {
+            // Start a transaction so we can delete related rows first (to satisfy FK constraints)
+            $conn->begin_transaction();
+
+            // Delete dependent borrows records first to avoid foreign key constraint errors
+            $stmt = $conn->prepare("DELETE FROM borrows WHERE user_id = ?");
+            if ($stmt === false) {
+                $conn->rollback();
+                return false;
+            }
+            $stmt->bind_param("i", $id);
+            if (!$stmt->execute()) {
+                $stmt->close();
+                $conn->rollback();
+                return false;
+            }
+            $stmt->close();
+
+            // Now delete the user
+            $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
+            if ($stmt === false) {
+                $conn->rollback();
+                return false;
+            }
+            $stmt->bind_param("i", $id);
+            if (!$stmt->execute()) {
+                $stmt->close();
+                $conn->rollback();
+                return false;
+            }
+            $stmt->close();
+
+            $conn->commit();
+            return true;
+        } catch (Exception $e) {
+            // Rollback on any error and return false instead of letting an exception bubble up
+            $conn->rollback();
+            return false;
+        }
     }
 
 public static function getUserById($id) {

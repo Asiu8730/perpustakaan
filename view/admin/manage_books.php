@@ -149,7 +149,7 @@ $books = BookController::getBooksPaginated($limit, $offset, $sort, $search);
                 <td><?= htmlspecialchars($row['publisher']); ?></td>
                 <td><?= htmlspecialchars($row['category_name'] ?? '-'); ?></td>
                 <td><?= htmlspecialchars($row['publish_date']); ?></td>
-                <td style="max-width:200px;"><?= nl2br(htmlspecialchars($row['description'] ?? '-')); ?></td>
+                <td class="desc-cell"><?= nl2br(htmlspecialchars($row['description'] ?? '-')); ?></td>
                 <td><?= htmlspecialchars($row['stock'] ?? 0); ?></td>
                 <td><?= htmlspecialchars($row['status']); ?></td>
                 <td>

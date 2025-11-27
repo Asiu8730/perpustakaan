@@ -42,9 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Password baru (opsional)
     $password_hashed = null;
     if (!empty($_POST['password'])) {
-        $plain = $_POST['password'];
-        if (strlen($plain) < 6) {
-            $errors[] = "Password minimal 6 karakter.";
+        $plain = trim($_POST['password']);
+        if (strlen($plain) < 8) {
+            $errors[] = "Password baru harus minimal 8 karakter.";
         } else {
             $password_hashed = password_hash($plain, PASSWORD_BCRYPT);
         }
@@ -132,7 +132,7 @@ include __DIR__ . '/../templates/header.php';
             <input type="email" name="email" value="<?= htmlspecialchars($email); ?>" required>
 
             <label>Password Baru (opsional):</label>
-            <input type="password" name="password" placeholder="Isi jika ingin mengganti password">
+            <input type="password" name="password" minlength="8"  placeholder="Minimal 8 karakter">
 
             <button type="submit" class="btn-save">Simpan Perubahan</button>
         </form>
