@@ -19,6 +19,11 @@ Aplikasi manajemen perpustakaan sederhana (PHP + MySQL) — menampilkan buku, ka
 ## Instalasi cepat
 1. Salin folder ke: `c:\xampp\htdocs\reca\perpustakaan`
 2. Buat database MySQL. Impor file dump SQL (misal `perpustakaan.sql`) via phpMyAdmin.
+    - Database name yang digunakan: `perpustakaan`
+    - Jika ingin cepat impor lewat command-line (MySQL):
+       ```bash
+       mysql -u root -p perfustakaan < perpustakaan.sql
+       ```
 3. Update konfigurasi DB:
    - `config/database.php` → sesuaikan host, user, password, database.
 4. Pastikan folder upload ada & writable:
@@ -50,9 +55,3 @@ Aplikasi manajemen perpustakaan sederhana (PHP + MySQL) — menampilkan buku, ka
 - Upload file gagal → periksa permission folder `uploads/`
 - Error query → cek konfigurasi DB & struktur tabel sesuai dump SQL
 
-## Pengembangan
-- Gunakan coding style sederhana (procedural + controller helpers)
-- Tambah test, sanitasi input lebih ketat, dan CSRF protection bila diproduksi
-
-## Lisensi
-Proyek ini untuk tujuan belajar / internal. Terapkan lisensi sesuai kebutuhan.

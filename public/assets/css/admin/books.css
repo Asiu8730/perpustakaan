@@ -360,12 +360,10 @@
 /* Deskripsi tabel: batasi tinggi dan aktifkan scroll */
 .books-table td.desc-cell{
     max-width: 200px;
-    max-height: 120px;     /* tinggi visible sebelum scroll */
-    overflow: auto;
+    /* keep the table cell flexible, inner element will handle scrolling */
+    vertical-align: top;
     text-align: left;
-    white-space: pre-line; /* pertahankan newline dari nl2br */
-    word-wrap: break-word;
-    padding: 10px;
+    padding: 6px;
     font-size: 13px;
 }
 
@@ -373,6 +371,19 @@
 .books-table td.desc-cell::-webkit-scrollbar { height: 8px; width: 8px; }
 .books-table td.desc-cell::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 6px; }
 .books-table td.desc-cell::-webkit-scrollbar-track { background: transparent; }
+
+/* scroll wrapper inside description cell */
+.books-table td.desc-cell .desc-inner{
+    max-height: 120px;     /* height visible before scroll */
+    overflow: auto;
+    white-space: pre-line; /* preserve newlines */
+    word-wrap: break-word;
+    padding-right: 6px; /* spacing for scrollbar */
+}
+
+.books-table td.desc-cell .desc-inner::-webkit-scrollbar { height: 8px; width: 8px; }
+.books-table td.desc-cell .desc-inner::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 6px; }
+.books-table td.desc-cell .desc-inner::-webkit-scrollbar-track { background: transparent; }
 
 /* =====================
    PRINT STYLES (ADMIN)
