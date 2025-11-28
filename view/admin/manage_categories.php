@@ -62,7 +62,7 @@ if (!empty($keyword)) {
         <input type="hidden" name="page" value="categories">
 
         <input type="text" name="search" placeholder="Cari kategori..."
-               value="<?= htmlspecialchars($keyword) ?>">
+                value="<?= htmlspecialchars($keyword) ?>">
 
         <button type="submit">Search</button>
 
@@ -88,8 +88,8 @@ if (!empty($keyword)) {
                     </button>
 
                     <a href="dashboard_admin.php?page=categories&delete=<?= $row['id'] ?>"
-                       class="action-btn delete-btn"
-                       onclick="return confirm('Hapus kategori ini?')">Hapus</a>
+                        class="action-btn delete-btn"
+                        onclick="return confirm('Hapus kategori ini?')">Hapus</a>
                 </td>
             </tr>
             <?php endforeach; ?>
@@ -107,8 +107,8 @@ if (!empty($keyword)) {
 
         <?php for ($i = 1; $i <= $total_pages; $i++): ?>
             <a href="dashboard_admin.php?page=categories&p=<?= $i ?>"
-               class="<?= ($i == $page) ? 'active' : '' ?>">
-               <?= $i ?>
+                class="<?= ($i == $page) ? 'active' : '' ?>">
+                <?= $i ?>
             </a>
         <?php endfor; ?>
 
@@ -121,7 +121,7 @@ if (!empty($keyword)) {
 
 <!-- Modal Tambah -->
 <div id="addModal" class="modal">
-  <div class="modal-content">
+    <div class="modal-content">
     <span class="close" onclick="closeAddModal()">&times;</span>
     <h3>Tambah Kategori</h3>
 
@@ -129,12 +129,12 @@ if (!empty($keyword)) {
         <input type="text" name="name" placeholder="Nama kategori" required>
         <button type="submit" name="add" class="btn-blue">Tambah</button>
     </form>
-  </div>
+    </div>
 </div>
 
 <!-- Modal Edit -->
 <div id="editModal" class="modal">
-  <div class="modal-content">
+    <div class="modal-content">
     <span class="close" onclick="closeEditModal()">&times;</span>
     <h3>Edit Kategori</h3>
 
@@ -143,7 +143,7 @@ if (!empty($keyword)) {
         <input type="text" name="name" id="edit_name" required>
         <button type="submit" name="update" class="btn-blue">Update</button>
     </form>
-  </div>
+    </div>
 </div>
 
 <script src="assets/js/admin/category.js"></script>

@@ -83,8 +83,8 @@ $total_pages = ceil($total_data / $limit);
 
     <!-- TOMBOL CETAK -->
     <a href="dashboard_admin.php?page=loans&print=1&filter=<?= $_GET['filter'] ?? '' ?>&search=<?= $keyword ?>" 
-       class="btn-blue" target="_blank">
-       Cetak Laporan
+        class="btn-blue" target="_blank">
+        Cetak Laporan
     </a>
 
     </form>
@@ -166,8 +166,8 @@ $total_pages = ceil($total_data / $limit);
 
         <?php for ($i = 1; $i <= $total_pages; $i++): ?>
             <a href="dashboard_admin.php?page=loans&p=<?= $i ?>&search=<?= $keyword ?>"
-               class="<?= ($i == $page) ? 'active' : '' ?>">
-               <?= $i ?>
+                class="<?= ($i == $page) ? 'active' : '' ?>">
+                <?= $i ?>
             </a>
         <?php endfor; ?>
 
@@ -179,7 +179,7 @@ $total_pages = ceil($total_data / $limit);
 
 <!-- MODAL KONFIRMASI -->
 <div id="confirmModal" class="modal">
-  <div class="modal-content">
+    <div class="modal-content">
 
     <span class="close" onclick="closeConfirmModal()">&times;</span>
 
@@ -206,7 +206,7 @@ $total_pages = ceil($total_data / $limit);
         <button type="submit" name="confirm" class="btn-blue">Konfirmasi</button>
     </form>
 
-  </div>
+    </div>
 </div>
 
 <script src="assets/js/admin/loans.js"></script>

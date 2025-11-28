@@ -42,7 +42,6 @@ $data = BorrowController::getMostBorrowedBooksFiltered($start, $end, $category, 
             <input type="number" name="limit" value="<?= $limit ?>" min="1" style="width:80px;">
                 <button type="submit" class="update-btn">Filter</button>
         </form>
-
             <button onclick="window.print()" class="btn-blue no-print" style="margin-left:12px;">Print Laporan</button>
     </div>
 
